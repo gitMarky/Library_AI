@@ -225,3 +225,9 @@ public func OnSaveScenarioAI(proplist fx_ai, proplist props)
 {
 	// called by the effect SaveScen()
 }
+
+
+/*-- Properties --*/
+
+local Plane = 300;
+

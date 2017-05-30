@@ -2,6 +2,11 @@
 	Open Clonk AI implemented with this library.
 */
 
+// Include the basic functionality
+#include AI_Controller
+// Include additional components
+#include AI_Helper_Clonk
+
 // Timer interval for the effect
 public func GetTimerInterval(){	return 3;}
 
@@ -137,33 +142,6 @@ public func Execute(effect fx, int time)
 }
 
 
-// Selects an item the clonk is about to use.
-public func SelectItem(effect fx, object item)
-{
-	if (!item)
-		return;
-	if (item->Contained() != fx.Target)
-		return;
-	fx.Target->SetHandItemPos(0, fx.Target->GetItemPos(item));
-}
-
-
-public func CancelAiming(effect fx)
-{
-	if (fx.aim_weapon)
-	{
-		fx.aim_weapon->~ControlUseCancel(fx.Target);
-		fx.aim_weapon = nil;
-	}
-	else
-	{
-		// Also cancel aiming done outside AI control.
-		fx.Target->~CancelAiming();
-	}
-	return true;
-}
-
-
 public func ExecuteThrow(effect fx)
 {
 	// Still carrying the weapon to throw?
@@ -202,22 +180,6 @@ public func ExecuteThrow(effect fx)
 	if (!fx.Target->GetCommand() || !Random(3))
 		fx.Target->SetCommand("MoveTo", fx.target);
 	return true;
-}
-
-
-public func CheckHandsAction(effect fx)
-{
-	// Can use hands?
-	if (fx.Target->~HasHandAction())
-		return true;
-	// Can't throw: Is it because e.g. we're scaling?
-	if (!fx.Target->HasActionProcedure())
-	{
-		this->ExecuteStand(fx);
-		return false;
-	}
-	// Probably hands busy. Just wait.
-	return false;
 }
 
 
