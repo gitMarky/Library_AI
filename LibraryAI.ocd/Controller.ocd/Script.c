@@ -3,7 +3,10 @@
 	Controls bots.
 
 	@author Marky
+	@credits Original AI structure/design by Sven2, Maikel
 */
+
+static const SAVESCEN_ID_AI = "AI";
 
 /*-- Public interface --*/
 
@@ -151,6 +154,26 @@ local FxAI = new Effect
 	{
 		return this.Interval != 0;	
 	},
+	EditorProps = {
+	},
+	// Save this effect and the AI for scenarios.
+	SaveScen = func(proplist props)
+	{
+		if (this.Target)
+		{
+			props->AddCall(SAVESCEN_ID_AI, this.control, "AddAI", this.Target);
+			if (!this.Interval)
+			{
+				props->AddCall(SAVESCEN_ID_AI, this.control, "SetActive", this.Target, false);
+			}
+			this.control->~OnSaveScenarioAI(this, props);
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}	
 };
 
 
@@ -182,13 +205,23 @@ local Plane = 300;
 
 /*-- Callbacks --*/
 
+
+// Callback from the effect Construction()-call
 public func OnAddAI(proplist fx_ai)
 {
 	// called by the effect Construction()
 }
 
+
 // Callback from the effect Destruction()-call
 public func OnRemoveAI(proplist fx_ai, int reason)
 {
 	// called by the effect Destruction()
+}
+
+
+// Callback from the effect SaveScen()-call
+public func OnSaveScenarioAI(proplist fx_ai, proplist props)
+{
+	// called by the effect SaveScen()
 }
