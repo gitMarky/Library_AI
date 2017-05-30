@@ -330,3 +330,365 @@ private func FindInventoryWeaponJavelin(effect fx)
 	}
 }
 
+// -------------------------------------------------------------------------------------------------
+
+// Enemy spawn definition depends on this
+local DefinitionPriority = 50;
+
+// AI Settings.
+local MaxAggroDistance = 200; // Lose sight to target if it is this far away (unless we're ranged - then always guard the range rect).
+local GuardRangeX = 300; // Search targets this far away in either direction (searching in rectangle).
+local GuardRangeY = 150; // Search targets this far away in either direction (searching in rectangle).
+
+/*-- Public interface --*/
+
+// Change whether target Clonk has an AI (used by editor).
+public func SetAI(object clonk, bool has_ai)
+{
+	var ai = GetAI(clonk);
+	if (has_ai)
+	{
+		// Only add if it doesn't have the effect yet.
+		if (!ai)
+			ai = AddAI(clonk);
+		return ai;
+	}
+	else
+	{
+		if (ai)
+			ai->Remove();
+	}
+}
+
+// Add AI execution timer to target Clonk.
+public func AddAI(object clonk)
+{
+	if (GetType(this) != C4V_Def)
+		Log("WARNING: AddAI(%v) not called from definition context but from %v", clonk, this);
+	var fx_ai = GetAI(clonk);
+	if (!fx_ai)
+		fx_ai = clonk->CreateEffect(FxAI, 1, 3, this);
+	if (!fx_ai)
+		return;
+	// Add AI default settings.	
+	SetAttackMode(clonk, "Default"); // also binds inventory
+	SetHome(clonk);
+	SetGuardRange(clonk, fx_ai.home_x - this.GuardRangeX, fx_ai.home_y - this.GuardRangeY, this.GuardRangeX * 2, this.GuardRangeY * 2);
+	SetMaxAggroDistance(clonk, this.MaxAggroDistance);
+	SetAutoSearchTarget(clonk, true);
+	return fx_ai;
+}
+
+public func GetAI(object clonk)
+{
+	if (GetType(this) != C4V_Def)
+		Log("WARNING: GetAI(%v) not called from definition context but from %v", clonk, this);
+	if (!clonk)
+		return nil;
+	return clonk->~GetAI();
+}
+
+// Set the current inventory to be removed when the clonk dies. Only works if clonk has an AI.
+public func BindInventory(object clonk)
+{
+	if (GetType(this) != C4V_Def)
+		Log("WARNING: BindInventory(%v) not called from definition context but from %v", clonk, this);
+	var fx_ai = GetAI(clonk);
+	if (!fx_ai)
+		return false;
+	var cnt = clonk->ContentsCount();
+	fx_ai.bound_weapons = CreateArray(cnt);
+	for (var i = 0; i < cnt; ++i)
+		fx_ai.bound_weapons[i] = clonk->Contents(i);
+	return true;
+}
+
+// Set the home position the Clonk returns to if he has no target.
+public func SetHome(object clonk, int x, int y, int dir)
+{
+	if (GetType(this) != C4V_Def)
+		Log("WARNING: SetHome(%v, %d, %d, %d) not called from definition context but from %v", clonk, x, y, dir, this);
+	var fx_ai = GetAI(clonk);
+	if (!fx_ai)
+		return false;
+	// nil/nil defaults to current position.
+	if (!GetType(x))
+		x = clonk->GetX();
+	if (!GetType(y))
+		y = clonk->GetY();
+	if (!GetType(dir))
+		dir = clonk->GetDir();
+	fx_ai.home_x = x;
+	fx_ai.home_y = y;
+	fx_ai.home_dir = dir;
+	return true;
+}
+
+// Set active state: Enables/Disables timer
+public func SetActive(object clonk, bool active)
+{
+	if (GetType(this) != C4V_Def)
+		Log("WARNING: SetActive(%v, %v) not called from definition context but from %v", clonk, active, this);
+	var fx_ai = GetAI(clonk);
+	if (!fx_ai)
+		return false;
+	if (!active)
+	{
+		// Inactive: Stop any activity.
+		clonk->SetCommand("None");
+		clonk->SetComDir(COMD_Stop);
+	}
+	return fx_ai->SetActive(active);
+}
+
+// Enable/disable auto-searching of targets.
+public func SetAutoSearchTarget(object clonk, bool new_auto_search_target)
+{
+	if (GetType(this) != C4V_Def)
+		Log("WARNING: SetAutoSearchTarget(%v, %v) not called from definition context but from %v", clonk, new_auto_search_target, this);
+	var fx_ai = GetAI(clonk);
+	if (!fx_ai)
+		return false;
+	fx_ai.auto_search_target = new_auto_search_target;
+	return true;
+}
+
+// Set the guard range to the provided rectangle.
+public func SetGuardRange(object clonk, int x, int y, int wdt, int hgt)
+{
+	if (GetType(this) != C4V_Def)
+		Log("WARNING: SetGuardRange(%v, %d, %d, %d, %d) not called from definition context but from %v", clonk, x, y, wdt, hgt, this);
+	var fx_ai = GetAI(clonk);
+	if (!fx_ai)
+		return false;
+	// Clip to landscape size.
+	if (x < 0)
+	{
+		wdt += x;
+		x = 0;
+	}
+	if (y < 0)
+	{
+		hgt += y;
+		y = 0;
+	}
+	wdt = Min(wdt, LandscapeWidth() - x);
+	hgt = Min(hgt, LandscapeHeight() - y);
+	fx_ai.guard_range = {x = x, y = y, wdt = wdt, hgt = hgt};
+	return true;
+}
+
+// Set the maximum distance the enemy will follow an attacking clonk.
+public func SetMaxAggroDistance(object clonk, int max_dist)
+{
+	if (GetType(this) != C4V_Def)
+		Log("WARNING: SetMaxAggroDistance(%v, %d) not called from definition context but from %v", clonk, max_dist, this);
+	var fx_ai = GetAI(clonk);
+	if (!fx_ai)
+		return false;
+	fx_ai.max_aggro_distance = max_dist;
+	return true;
+}
+
+// Set range in which, on first encounter, allied AI clonks get the same aggro target set.
+public func SetAllyAlertRange(object clonk, int new_range)
+{
+	if (GetType(this) != C4V_Def)
+		Log("WARNING: SetAllyAlertRange(%v, %d) not called from definition context but from %v", clonk, new_range, this);
+	var fx_ai = GetAI(clonk);
+	if (!fx_ai)
+		return false;
+	fx_ai.ally_alert_range = new_range;
+	return true;
+}
+
+// Set callback function name to be called in game script when this AI is first encountered
+// Callback function first parameter is (this) AI clonk, second parameter is player clonk.
+// The callback should return true to be cleared and not called again. Otherwise, it will be called every time a new target is found.
+public func SetEncounterCB(object clonk, string cb_fn)
+{
+	if (GetType(this) != C4V_Def)
+		Log("WARNING: SetEncounterCB(%v, %s) not called from definition context but from %v", clonk, cb_fn, this);
+	var fx_ai = GetAI(clonk);
+	if (!fx_ai)
+		return false;
+	fx_ai.encounter_cb = cb_fn;
+	return true;
+}
+
+// Set attack path
+public func SetAttackPath(object clonk, array new_attack_path)
+{
+	if (GetType(this) != C4V_Def)
+		Log("WARNING: SetAttackPath(%v, %v) not called from definition context but from %v", clonk, new_attack_path, this);
+	var fx_ai = GetAI(clonk);
+	if (!fx_ai)
+		return false;
+	fx_ai.attack_path = new_attack_path;
+	return true;
+}
+
+// Set controlled vehicle
+public func SetVehicle(object clonk, object new_vehicle)
+{
+	if (GetType(this) != C4V_Def)
+		Log("WARNING: SetVehicle(%v, %v) not called from definition context but from %v", clonk, new_vehicle, this);
+	var fx_ai = GetAI(clonk);
+	if (!fx_ai)
+		return false;
+	fx_ai.vehicle = new_vehicle;
+	return true;
+}
+
+local FxAI_OC = new Effect
+{	
+	SetAttackMode = func(proplist attack_mode)
+	{
+		// Called by editor delegate when attack mode is changed.
+		// For now, attack mode parameter delegates are not supported. Just set by name.
+		return this.control->SetAttackMode(this.Target, attack_mode.Identifier);
+	},
+	SetAttackPath = func(array attack_path)
+	{
+		// Called by editor delegate when attack path is changed.
+		return this.control->SetAttackPath(this.Target, attack_path);
+	},
+	EditorProps = {
+		guard_range = { Name = "$GuardRange$", Type = "rect", Storage = "proplist", Color = 0xff00, Relative = false },
+		ignore_allies = { Name = "$IgnoreAllies$", Type = "bool" },
+		max_aggro_distance = { Name = "$MaxAggroDistance$", Type = "circle", Color = 0x808080 },
+		active = { Name = "$Active$", EditorHelp = "$ActiveHelp$", Type = "bool", Priority = 50, AsyncGet = "GetActive", Set = "SetActive" },
+		auto_search_target = { Name = "$AutoSearchTarget$", EditorHelp = "$AutoSearchTargetHelp$", Type = "bool" },
+		attack_path = { Name = "$AttackPath$", EditorHelp = "$AttackPathHelp$", Type = "enum", Set = "SetAttackPath", Options = [
+			{ Name="$None$" },
+			{ Name="$AttackPath$", Type=C4V_Array, Value = [{X = 0, Y = 0}], Delegate =
+				{ Name="$AttackPath$", EditorHelp="$AttackPathHelp$", Type="polyline", StartFromObject=true, DrawArrows=true, Color=0xdf0000, Relative=false }
+			}
+		] }
+	},
+};
+
+/*-- Editor Properties --*/
+
+public func Definition(proplist def)
+{
+	if (!Clonk.EditorProps)
+		Clonk.EditorProps = {};
+	if (def == AI) // TODO: Make AI an enum so different AI types can be selected.
+	{
+		Clonk.EditorProps.AI =
+		{
+			Type = "has_effect",
+			Effect = "FxAI",
+			Set = Format("%i->SetAI", def),
+			SetGlobal = true
+		};
+	}
+	def->DefinitionAttackModes(def);
+	// Add AI user actions.
+	var enemy_evaluator = UserAction->GetObjectEvaluator("IsClonk", "$Enemy$", "$EnemyHelp$");
+	enemy_evaluator.Priority = 100;
+	UserAction->AddEvaluator("Action", "Clonk", "$SetAIActivated$", "$SetAIActivatedHelp$", "ai_set_activated", [def, def.EvalAct_SetActive], 
+		{
+			Enemy = nil,
+			AttackTarget = {
+				Function= "triggering_clonk"
+			},
+			Status = {
+				Function = "bool_constant",
+				Value = true
+			}
+		},
+		{
+			Type = "proplist",
+			Display = "{{Enemy}}: {{Status}} ({{AttackTarget}})",
+			EditorProps = {
+				Enemy = enemy_evaluator,
+				AttackTarget = UserAction->GetObjectEvaluator("IsClonk", "$AttackTarget$", "$AttackTargetHelp$"),
+				Status = new UserAction.Evaluator.Boolean { Name = "$Status$" }
+			}
+		}
+	);
+	UserAction->AddEvaluator("Action", "Clonk", "$SetAINewHome$", "$SetAINewHomeHelp$", "ai_set_new_home", [def, def.EvalAct_SetNewHome],
+		{
+			Enemy = nil,
+			HomePosition = nil,
+			Status = {
+				Function = "bool_constant",
+				Value = true
+			}
+		},
+		{
+			Type = "proplist",
+			Display = "{{Enemy}} -> {{NewHome}}",
+			EditorProps = {
+				Enemy = enemy_evaluator,
+				NewHome = new UserAction.Evaluator.Position {
+					Name = "$NewHome$",
+					EditorHelp = "$NewHomeHelp$"
+				},
+				NewHomeDir = {
+					Type = "enum",
+					Name = "$NewHomeDir$",
+					EditorHelp = "$NewHomeDirHelp$",
+					Options = [
+						{ Name = "$Unchanged$" },
+						{ Name = "$Left$", Value = DIR_Left },
+						{ Name = "$Right$", Value = DIR_Right }
+					]
+				},
+			}
+		}
+	);
+}
+
+public func EvalAct_SetActive(proplist props, proplist context)
+{
+	// User action: Activate enemy AI.
+	var enemy = UserAction->EvaluateValue("Object", props.Enemy, context);
+	var attack_target = UserAction->EvaluateValue("Object", props.AttackTarget, context);
+	var status = UserAction->EvaluateValue("Boolean", props.Status, context);
+	if (!enemy)
+		return;
+	// Ensure enemy AI exists
+	var fx = GetAI(enemy);
+	if (!fx)
+	{
+		// Deactivated? Then we don't need an AI effect.
+		if (!status)
+			return;
+		fx = AddAI(enemy);
+		if (!fx || !enemy)
+			return;
+	}
+	// Set activation.
+	fx->SetActive(status);
+	// Set specific target if desired.
+	if (attack_target)
+		fx.target = attack_target;
+}
+
+public func EvalAct_SetNewHome(proplist props, proplist context)
+{
+	// User action: Set new home.
+	var enemy = UserAction->EvaluateValue("Object", props.Enemy, context);
+	var new_home = UserAction->EvaluatePosition(props.NewHome, context);
+	var new_home_dir = props.NewHomeDir;
+	if (!enemy)
+		return;
+	// Ensure enemy AI exists.
+	var fx = GetAI(enemy);
+	if (!fx)
+	{
+		fx = AddAI(enemy);
+		if (!fx || !enemy)
+			return;
+		// Create without attack command.
+		SetAutoSearchTarget(enemy, false);
+	}
+	fx.command = this.ExecuteIdle;
+	fx.home_x = new_home[0];
+	fx.home_y = new_home[1];
+	if (GetType(new_home_dir))
+		fx.home_dir = new_home_dir;
+}
