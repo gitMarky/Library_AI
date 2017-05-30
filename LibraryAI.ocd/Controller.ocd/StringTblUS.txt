@@ -1,2 +1,3 @@
 ChooseAI=AI selection
 NoAI=No AI
+NoAIEditorHelp=Removes the AI from this object.

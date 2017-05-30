@@ -523,7 +523,7 @@ public func OnDefineAI(proplist def)
 	_inherited(def);
 	
 	// Can be added to Clonk
-	InitEditorProp_AISelection(Clonk);
+	AddEditorProp_AISelection(Clonk, AI_OpenClonk);
 
 	def->DefinitionAttackModes(def);
 	// Add AI user actions.

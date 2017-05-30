@@ -34,7 +34,7 @@ public func SetAI(object clonk, id type)
 // Add AI execution timer to target Clonk.
 public func AddAI(object clonk, id type)
 {
-	AssertDefinitionContext(Format("AddAI(%v)", clonk));
+	AssertDefinitionContext(Format("AddAI(%v, %v)", clonk, type));
 
 	var fx_ai = GetAI(clonk) ?? clonk->CreateEffect(FxAI, 1, 1, type ?? this);
 	return fx_ai;
@@ -204,6 +204,15 @@ public func SelectItem(effect fx, object item)
 
 /*-- Editor Properties --*/
 
+// Adds an AI to the selection
+public func AddEditorProp_AISelection(proplist type, id ai_type)
+{
+	InitEditorProp_AISelection(type);
+	PushBack(type.EditorProps.AI_Controller.Options, EditorProp_AIType(ai_type));
+}
+
+
+// Initializes the selection property
 private func InitEditorProp_AISelection(proplist type)
 {
 	// ensure that the poperties exist
@@ -227,24 +236,34 @@ private func InitEditorProp_AISelection(proplist type)
 	
 	// add default options
 	if (GetLength(type.EditorProps.AI_Controller.Options) == 0)
-	{		
-		// Add to editor option for AI effect
-		var option_no_ai = {
+	{
+		PushBack(type.EditorProps.AI_Controller.Options, EditorProp_AIType(nil));
+	}
+}
+
+
+// Gets an AI type entry for the selection list
+private func EditorProp_AIType(id type)
+{
+	if (type)
+	{
+		var option_ai = {
+			Name = type.Name ?? type->GetName(),
+			EditorHelp = type.EditorHelp,
+			Value = type
+		};
+	
+		if (!option_ai.EditorHelp && type.GetEditorHelp) option_ai.EditorHelp = type->GetEditorHelp();
+	
+		return option_ai;
+	}
+	else
+	{
+		return {
 			Name = "$NoAI$",
-			//EditorHelp = am.EditorHelp,
+			EditorHelp = "$NoAIEditorHelp$",
 			Value = nil,
 		};
-			
-		var option_ai = {
-			Name = AI_Controller.Name ?? AI_Controller->GetName(),
-			EditorHelp = AI_Controller.EditorHelp,
-			Value = AI_Controller
-		};
-			
-		// TODO if (!am_option.EditorHelp && am.GetEditorHelp) am_option.EditorHelp = am->GetEditorHelp();
-	
-		PushBack(type.EditorProps.AI_Controller.Options, option_no_ai);
-		PushBack(type.EditorProps.AI_Controller.Options, option_ai);
 	}
 }
 

@@ -1,2 +1,3 @@
 ChooseAI=KI-Auswahl
 NoAI=Ohne KI
+NoAIEditorHelp=Entfernt die KI von diesem Objekt.
