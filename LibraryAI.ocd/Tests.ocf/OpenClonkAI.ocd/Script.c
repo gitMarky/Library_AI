@@ -486,8 +486,8 @@ public func SetVehicle(object clonk, object new_vehicle)
 }
 
 
-local FxAI_OC = new Effect
-{	
+local FxAIoverride = new FxAI
+{
 	SetAttackMode = func(proplist attack_mode)
 	{
 		// Called by editor delegate when attack mode is changed.
@@ -498,19 +498,6 @@ local FxAI_OC = new Effect
 	{
 		// Called by editor delegate when attack path is changed.
 		return this.control->SetAttackPath(this.Target, attack_path);
-	},
-	EditorProps = {
-		guard_range = { Name = "$GuardRange$", Type = "rect", Storage = "proplist", Color = 0xff00, Relative = false },
-		ignore_allies = { Name = "$IgnoreAllies$", Type = "bool" },
-		max_aggro_distance = { Name = "$MaxAggroDistance$", Type = "circle", Color = 0x808080 },
-		active = { Name = "$Active$", EditorHelp = "$ActiveHelp$", Type = "bool", Priority = 50, AsyncGet = "GetActive", Set = "SetActive" },
-		auto_search_target = { Name = "$AutoSearchTarget$", EditorHelp = "$AutoSearchTargetHelp$", Type = "bool" },
-		attack_path = { Name = "$AttackPath$", EditorHelp = "$AttackPathHelp$", Type = "enum", Set = "SetAttackPath", Options = [
-			{ Name="$None$" },
-			{ Name="$AttackPath$", Type=C4V_Array, Value = [{X = 0, Y = 0}], Delegate =
-				{ Name="$AttackPath$", EditorHelp="$AttackPathHelp$", Type="polyline", StartFromObject=true, DrawArrows=true, Color=0xdf0000, Relative=false }
-			}
-		] }
 	},
 };
 
@@ -524,7 +511,26 @@ public func OnDefineAI(proplist def)
 	
 	// Can be added to Clonk
 	AddEditorProp_AISelection(Clonk, AI_OpenClonk);
-
+	
+	// Set the additional editor properties
+	var additional_props =
+	{
+		guard_range = { Name = "$GuardRange$", Type = "rect", Storage = "proplist", Color = 0xff00, Relative = false },
+		ignore_allies = { Name = "$IgnoreAllies$", Type = "bool" },
+		max_aggro_distance = { Name = "$MaxAggroDistance$", Type = "circle", Color = 0x808080 },
+		active = { Name = "$Active$", EditorHelp = "$ActiveHelp$", Type = "bool", Priority = 50, AsyncGet = "GetActive", Set = "SetActive" },
+		auto_search_target = { Name = "$AutoSearchTarget$", EditorHelp = "$AutoSearchTargetHelp$", Type = "bool" },
+		attack_path = { Name = "$AttackPath$", EditorHelp = "$AttackPathHelp$", Type = "enum", Set = "SetAttackPath", Options = [
+			{ Name="$None$" },
+			{ Name="$AttackPath$", Type=C4V_Array, Value = [{X = 0, Y = 0}], Delegate =
+				{ Name="$AttackPath$", EditorHelp="$AttackPathHelp$", Type="polyline", StartFromObject=true, DrawArrows=true, Color=0xdf0000, Relative=false }
+			}
+		] },
+	};
+	
+	AddProperties(def.FxAI.EditorProps, additional_props);
+	
+	// Set the other options
 	def->DefinitionAttackModes(def);
 	// Add AI user actions.
 	var enemy_evaluator = UserAction->GetObjectEvaluator("IsClonk", "$Enemy$", "$EnemyHelp$");
