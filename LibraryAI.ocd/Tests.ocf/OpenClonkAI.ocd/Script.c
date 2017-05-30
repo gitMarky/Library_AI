@@ -521,6 +521,9 @@ local FxAI_OC = new Effect
 public func OnDefineAI(proplist def)
 {
 	_inherited(def);
+	
+	// Can be added to Clonk
+	InitEditorProp_AISelection(Clonk);
 
 	def->DefinitionAttackModes(def);
 	// Add AI user actions.

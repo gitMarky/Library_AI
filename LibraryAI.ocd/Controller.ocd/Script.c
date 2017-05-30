@@ -8,6 +8,13 @@
 
 static const SAVESCEN_ID_AI = "AI";
 
+/*-- Engine callbacks --*/
+
+public func Definition(proplist type)
+{
+	this->OnDefineAI(type);
+}
+
 /*-- Public interface --*/
 
 // Change whether target Clonk has an AI (used by editor).
@@ -197,51 +204,56 @@ public func SelectItem(effect fx, object item)
 
 /*-- Editor Properties --*/
 
-// TODO
-
-public func Definition(proplist type)
+private func InitEditorProp_AISelection(proplist type)
 {
-	if (type == AI_Controller)
+	// ensure that the poperties exist
+	if (!type.EditorProps)
 	{
-		if (!Clonk.EditorProps)
-			Clonk.EditorProps = {};
-		Clonk.EditorProps.AI_Controller =
+		type.EditorProps = {};
+	}
+	
+	// ensure that the list exists
+	if (!type.EditorProps.AI_Controller)
+	{
+		type.EditorProps.AI_Controller =
 		{
 			Type = "enum",
 			Name = "$ChooseAI$",
 			Options = [],
-			Set = Format("%i->SetAI", AI_Controller),
+			Set = Format("%i->SetAI", AI_Controller), // this is the AI_Controller on purpose
 			SetGlobal = true
 		};
-		
+	}
+	
+	// add default options
+	if (GetLength(type.EditorProps.AI_Controller.Options) == 0)
+	{		
 		// Add to editor option for AI effect
 		var option_no_ai = {
 			Name = "$NoAI$",
 			//EditorHelp = am.EditorHelp,
 			Value = nil,
 		};
-		
+			
 		var option_ai = {
 			Name = AI_Controller.Name ?? AI_Controller->GetName(),
 			EditorHelp = AI_Controller.EditorHelp,
 			Value = AI_Controller
 		};
-		
+			
 		// TODO if (!am_option.EditorHelp && am.GetEditorHelp) am_option.EditorHelp = am->GetEditorHelp();
 	
-		PushBack(Clonk.EditorProps.AI_Controller.Options, option_no_ai);
-		PushBack(Clonk.EditorProps.AI_Controller.Options, option_ai);
-		
-		this->OnDefineAI(type);
+		PushBack(type.EditorProps.AI_Controller.Options, option_no_ai);
+		PushBack(type.EditorProps.AI_Controller.Options, option_ai);
 	}
 }
+
 
 /*-- Properties --*/
 
 local Plane = 300;
 
 /*-- Callbacks --*/
-
 
 // Callback from the effect Construction()-call
 public func OnAddAI(proplist fx_ai)
@@ -267,5 +279,5 @@ public func OnSaveScenarioAI(proplist fx_ai, proplist props)
 // Callback from the Definition()-call
 public func OnDefineAI(proplist type)
 {
-	// called by the effect Definition()
+	// does nothing
 }
