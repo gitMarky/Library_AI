@@ -342,52 +342,6 @@ local GuardRangeY = 150; // Search targets this far away in either direction (se
 
 /*-- Public interface --*/
 
-// Change whether target Clonk has an AI (used by editor).
-public func SetAI(object clonk, bool has_ai)
-{
-	var ai = GetAI(clonk);
-	if (has_ai)
-	{
-		// Only add if it doesn't have the effect yet.
-		if (!ai)
-			ai = AddAI(clonk);
-		return ai;
-	}
-	else
-	{
-		if (ai)
-			ai->Remove();
-	}
-}
-
-// Add AI execution timer to target Clonk.
-public func AddAI(object clonk)
-{
-	if (GetType(this) != C4V_Def)
-		Log("WARNING: AddAI(%v) not called from definition context but from %v", clonk, this);
-	var fx_ai = GetAI(clonk);
-	if (!fx_ai)
-		fx_ai = clonk->CreateEffect(FxAI, 1, 3, this);
-	if (!fx_ai)
-		return;
-	// Add AI default settings.	
-	SetAttackMode(clonk, "Default"); // also binds inventory
-	SetHome(clonk);
-	SetGuardRange(clonk, fx_ai.home_x - this.GuardRangeX, fx_ai.home_y - this.GuardRangeY, this.GuardRangeX * 2, this.GuardRangeY * 2);
-	SetMaxAggroDistance(clonk, this.MaxAggroDistance);
-	SetAutoSearchTarget(clonk, true);
-	return fx_ai;
-}
-
-public func GetAI(object clonk)
-{
-	if (GetType(this) != C4V_Def)
-		Log("WARNING: GetAI(%v) not called from definition context but from %v", clonk, this);
-	if (!clonk)
-		return nil;
-	return clonk->~GetAI();
-}
-
 // Set the current inventory to be removed when the clonk dies. Only works if clonk has an AI.
 public func BindInventory(object clonk)
 {
@@ -402,6 +356,7 @@ public func BindInventory(object clonk)
 		fx_ai.bound_weapons[i] = clonk->Contents(i);
 	return true;
 }
+
 
 // Set the home position the Clonk returns to if he has no target.
 public func SetHome(object clonk, int x, int y, int dir)
@@ -424,22 +379,6 @@ public func SetHome(object clonk, int x, int y, int dir)
 	return true;
 }
 
-// Set active state: Enables/Disables timer
-public func SetActive(object clonk, bool active)
-{
-	if (GetType(this) != C4V_Def)
-		Log("WARNING: SetActive(%v, %v) not called from definition context but from %v", clonk, active, this);
-	var fx_ai = GetAI(clonk);
-	if (!fx_ai)
-		return false;
-	if (!active)
-	{
-		// Inactive: Stop any activity.
-		clonk->SetCommand("None");
-		clonk->SetComDir(COMD_Stop);
-	}
-	return fx_ai->SetActive(active);
-}
 
 // Enable/disable auto-searching of targets.
 public func SetAutoSearchTarget(object clonk, bool new_auto_search_target)
@@ -452,6 +391,7 @@ public func SetAutoSearchTarget(object clonk, bool new_auto_search_target)
 	fx_ai.auto_search_target = new_auto_search_target;
 	return true;
 }
+
 
 // Set the guard range to the provided rectangle.
 public func SetGuardRange(object clonk, int x, int y, int wdt, int hgt)
@@ -478,6 +418,7 @@ public func SetGuardRange(object clonk, int x, int y, int wdt, int hgt)
 	return true;
 }
 
+
 // Set the maximum distance the enemy will follow an attacking clonk.
 public func SetMaxAggroDistance(object clonk, int max_dist)
 {
@@ -490,6 +431,7 @@ public func SetMaxAggroDistance(object clonk, int max_dist)
 	return true;
 }
 
+
 // Set range in which, on first encounter, allied AI clonks get the same aggro target set.
 public func SetAllyAlertRange(object clonk, int new_range)
 {
@@ -501,6 +443,7 @@ public func SetAllyAlertRange(object clonk, int new_range)
 	fx_ai.ally_alert_range = new_range;
 	return true;
 }
+
 
 // Set callback function name to be called in game script when this AI is first encountered
 // Callback function first parameter is (this) AI clonk, second parameter is player clonk.
@@ -516,6 +459,7 @@ public func SetEncounterCB(object clonk, string cb_fn)
 	return true;
 }
 
+
 // Set attack path
 public func SetAttackPath(object clonk, array new_attack_path)
 {
@@ -528,6 +472,7 @@ public func SetAttackPath(object clonk, array new_attack_path)
 	return true;
 }
 
+
 // Set controlled vehicle
 public func SetVehicle(object clonk, object new_vehicle)
 {
@@ -539,6 +484,7 @@ public func SetVehicle(object clonk, object new_vehicle)
 	fx_ai.vehicle = new_vehicle;
 	return true;
 }
+
 
 local FxAI_OC = new Effect
 {	
@@ -568,15 +514,16 @@ local FxAI_OC = new Effect
 	},
 };
 
+
 /*-- Editor Properties --*/
 
 public func Definition(proplist def)
 {
 	if (!Clonk.EditorProps)
 		Clonk.EditorProps = {};
-	if (def == AI) // TODO: Make AI an enum so different AI types can be selected.
+	if (def == AI_OpenClonk) // TODO: Make AI an enum so different AI types can be selected.
 	{
-		Clonk.EditorProps.AI =
+		Clonk.EditorProps.AI_OpenClonk =
 		{
 			Type = "has_effect",
 			Effect = "FxAI",
