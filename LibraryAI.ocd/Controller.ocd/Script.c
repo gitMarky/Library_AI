@@ -148,7 +148,7 @@ local FxAI = new Effect
 	},
 	SetActive = func(bool active)
 	{
-		this.Interval = (control_def->~GetTimerInterval() ?? 1) * active;	
+		this.Interval = (this.control->~GetTimerInterval() ?? 1) * active;	
 	},
 	GetActive = func()
 	{
@@ -225,9 +225,3 @@ public func OnSaveScenarioAI(proplist fx_ai, proplist props)
 {
 	// called by the effect SaveScen()
 }
-
-
-/*-- Properties --*/
-
-local Plane = 300;
-

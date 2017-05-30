@@ -1,5 +1,5 @@
 [DefCore]
 id=AI_Helper_Clonk
 Version=8,0
-Category=C4D_None | C4D_MouseIgnore
+Category=C4D_StaticBack
 HideInCreator=true
