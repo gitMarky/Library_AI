@@ -2,6 +2,17 @@
 	Open Clonk AI implemented with this library.
 */
 
+// Include the different parts of the AI.
+#include AI_Appearance
+#include AI_Debugging
+#include AI_HelperFunctions
+#include AI_MeleeWeapons
+#include AI_Movement
+#include AI_Protection
+#include AI_RangedWeapons
+#include AI_TargetFinding
+#include AI_Vehicles
+#include AI_AttackModes
 // Include the basic functionality
 #include AI_Controller
 // Include additional components
