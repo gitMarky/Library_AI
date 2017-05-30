@@ -517,20 +517,11 @@ local FxAI_OC = new Effect
 
 /*-- Editor Properties --*/
 
-public func Definition(proplist def)
+// Callback from the Definition()-call
+public func OnDefineAI(proplist def)
 {
-	if (!Clonk.EditorProps)
-		Clonk.EditorProps = {};
-	if (def == AI_OpenClonk) // TODO: Make AI an enum so different AI types can be selected.
-	{
-		Clonk.EditorProps.AI_OpenClonk =
-		{
-			Type = "has_effect",
-			Effect = "FxAI",
-			Set = Format("%i->SetAI", def),
-			SetGlobal = true
-		};
-	}
+	_inherited(def);
+
 	def->DefinitionAttackModes(def);
 	// Add AI user actions.
 	var enemy_evaluator = UserAction->GetObjectEvaluator("IsClonk", "$Enemy$", "$EnemyHelp$");

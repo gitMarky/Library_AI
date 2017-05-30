@@ -11,11 +11,11 @@ static const SAVESCEN_ID_AI = "AI";
 /*-- Public interface --*/
 
 // Change whether target Clonk has an AI (used by editor).
-public func SetAI(object clonk, bool should_have_ai)
+public func SetAI(object clonk, id type)
 {
-	if (should_have_ai)
+	if (type)
 	{
-		return AddAI(clonk);
+		return AddAI(clonk, type);
 	}
 	else
 	{
@@ -25,11 +25,11 @@ public func SetAI(object clonk, bool should_have_ai)
 
 
 // Add AI execution timer to target Clonk.
-public func AddAI(object clonk)
+public func AddAI(object clonk, id type)
 {
 	AssertDefinitionContext(Format("AddAI(%v)", clonk));
 
-	var fx_ai = GetAI(clonk) ?? clonk->CreateEffect(FxAI, 1, 1, this);
+	var fx_ai = GetAI(clonk) ?? clonk->CreateEffect(FxAI, 1, 1, type ?? this);
 	return fx_ai;
 }
 
@@ -199,6 +199,43 @@ public func SelectItem(effect fx, object item)
 
 // TODO
 
+public func Definition(proplist type)
+{
+	if (type == AI_Controller)
+	{
+		if (!Clonk.EditorProps)
+			Clonk.EditorProps = {};
+		Clonk.EditorProps.AI_Controller =
+		{
+			Type = "enum",
+			Name = "$ChooseAI$",
+			Options = [],
+			Set = Format("%i->SetAI", AI_Controller),
+			SetGlobal = true
+		};
+		
+		// Add to editor option for AI effect
+		var option_no_ai = {
+			Name = "$NoAI$",
+			//EditorHelp = am.EditorHelp,
+			Value = nil,
+		};
+		
+		var option_ai = {
+			Name = AI_Controller.Name ?? AI_Controller->GetName(),
+			EditorHelp = AI_Controller.EditorHelp,
+			Value = AI_Controller
+		};
+		
+		// TODO if (!am_option.EditorHelp && am.GetEditorHelp) am_option.EditorHelp = am->GetEditorHelp();
+	
+		PushBack(Clonk.EditorProps.AI_Controller.Options, option_no_ai);
+		PushBack(Clonk.EditorProps.AI_Controller.Options, option_ai);
+		
+		this->OnDefineAI(type);
+	}
+}
+
 /*-- Properties --*/
 
 local Plane = 300;
@@ -224,4 +261,11 @@ public func OnRemoveAI(proplist fx_ai, int reason)
 public func OnSaveScenarioAI(proplist fx_ai, proplist props)
 {
 	// called by the effect SaveScen()
+}
+
+
+// Callback from the Definition()-call
+public func OnDefineAI(proplist type)
+{
+	// called by the effect Definition()
 }
