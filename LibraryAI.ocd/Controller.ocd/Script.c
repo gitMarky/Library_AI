@@ -113,11 +113,11 @@ local FxAI = new Effect
 		this.Interval = control_def->~GetTimerInterval() ?? 1;
 		// Store the definition that controls this AI.
 		this.control = control_def;
-		// Callback to the controller
-		this.control->~OnAddAI(this);
 		// Give the AI a helper function to get the AI control effect.
 		this.Target.ai = this;
 		this.Target.GetAI = this.GetAI;
+		// Callback to the controller
+		this.control->~OnAddAI(this);
 		return FX_OK;
 	},
 	
