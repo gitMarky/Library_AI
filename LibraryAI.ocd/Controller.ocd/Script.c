@@ -22,7 +22,7 @@ public func SetAI(object clonk, id type)
 {
 	if (type)
 	{
-		return AddAI(clonk, type);
+		return type->AddAI(clonk, type); // call from the definition there
 	}
 	else
 	{
