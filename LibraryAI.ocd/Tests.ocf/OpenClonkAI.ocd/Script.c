@@ -16,7 +16,8 @@
 // Include the basic functionality
 #include AI_Controller
 // Include additional components
-#include AI_Helper_Clonk
+#include AI_HelperClonk
+#include AI_HomePosition
 
 // Timer interval for the effect
 public func GetTimerInterval(){	return 3;}
@@ -59,12 +60,12 @@ public func OnRemoveAI(proplist fx_ai, int reason)
 // Callback from the effect SaveScen()-call
 public func OnSaveScenarioAI(proplist fx_ai, proplist props)
 {
+	_inherited(fx_ai, props);
+
 	if (fx_ai.attack_mode.Identifier != "Default")
 		props->AddCall(SAVESCEN_ID_AI, fx_ai.control, "SetAttackMode", fx_ai.Target, Format("%v", fx_ai.attack_mode.Identifier));
 	if (fx_ai.attack_path)
 		props->AddCall(SAVESCEN_ID_AI, fx_ai.control, "SetAttackPath", fx_ai.Target, fx_ai.attack_path);
-	if (fx_ai.home_x != fx_ai.Target->GetX() || fx_ai.home_y != fx_ai.Target->GetY() || fx_ai.home_dir != fx_ai.Target->GetDir())
-		props->AddCall(SAVESCEN_ID_AI, fx_ai.control, "SetHome", fx_ai.Target, fx_ai.home_x, fx_ai.home_y, GetConstantNameByValueSafe(fx_ai.home_dir, "DIR_"));
 	props->AddCall(SAVESCEN_ID_AI, fx_ai.control, "SetGuardRange", fx_ai.Target, fx_ai.guard_range.x, fx_ai.guard_range.y, fx_ai.guard_range.wdt, fx_ai.guard_range.hgt);
 	if (fx_ai.max_aggro_distance != fx_ai.control.MaxAggroDistance)
 		props->AddCall(SAVESCEN_ID_AI, fx_ai.control, "SetMaxAggroDistance", fx_ai.Target, fx_ai.max_aggro_distance);
@@ -358,28 +359,6 @@ public func BindInventory(object clonk)
 }
 
 
-// Set the home position the Clonk returns to if he has no target.
-public func SetHome(object clonk, int x, int y, int dir)
-{
-	if (GetType(this) != C4V_Def)
-		Log("WARNING: SetHome(%v, %d, %d, %d) not called from definition context but from %v", clonk, x, y, dir, this);
-	var fx_ai = GetAI(clonk);
-	if (!fx_ai)
-		return false;
-	// nil/nil defaults to current position.
-	if (!GetType(x))
-		x = clonk->GetX();
-	if (!GetType(y))
-		y = clonk->GetY();
-	if (!GetType(dir))
-		dir = clonk->GetDir();
-	fx_ai.home_x = x;
-	fx_ai.home_y = y;
-	fx_ai.home_dir = dir;
-	return true;
-}
-
-
 // Enable/disable auto-searching of targets.
 public func SetAutoSearchTarget(object clonk, bool new_auto_search_target)
 {
@@ -556,8 +535,6 @@ public func OnDefineAI(proplist def)
 	// Set the other options
 	def->DefinitionAttackModes(def);
 	// Add AI user actions.
-	var enemy_evaluator = UserAction->GetObjectEvaluator("IsClonk", "$Enemy$", "$EnemyHelp$");
-	enemy_evaluator.Priority = 100;
 	UserAction->AddEvaluator("Action", "Clonk", "$SetAIActivated$", "$SetAIActivatedHelp$", "ai_set_activated", [def, def.EvalAct_SetActive], 
 		{
 			Enemy = nil,
@@ -573,40 +550,9 @@ public func OnDefineAI(proplist def)
 			Type = "proplist",
 			Display = "{{Enemy}}: {{Status}} ({{AttackTarget}})",
 			EditorProps = {
-				Enemy = enemy_evaluator,
+				Enemy = this->~UserAction_EnemyEvaluator(),
 				AttackTarget = UserAction->GetObjectEvaluator("IsClonk", "$AttackTarget$", "$AttackTargetHelp$"),
 				Status = new UserAction.Evaluator.Boolean { Name = "$Status$" }
-			}
-		}
-	);
-	UserAction->AddEvaluator("Action", "Clonk", "$SetAINewHome$", "$SetAINewHomeHelp$", "ai_set_new_home", [def, def.EvalAct_SetNewHome],
-		{
-			Enemy = nil,
-			HomePosition = nil,
-			Status = {
-				Function = "bool_constant",
-				Value = true
-			}
-		},
-		{
-			Type = "proplist",
-			Display = "{{Enemy}} -> {{NewHome}}",
-			EditorProps = {
-				Enemy = enemy_evaluator,
-				NewHome = new UserAction.Evaluator.Position {
-					Name = "$NewHome$",
-					EditorHelp = "$NewHomeHelp$"
-				},
-				NewHomeDir = {
-					Type = "enum",
-					Name = "$NewHomeDir$",
-					EditorHelp = "$NewHomeDirHelp$",
-					Options = [
-						{ Name = "$Unchanged$" },
-						{ Name = "$Left$", Value = DIR_Left },
-						{ Name = "$Right$", Value = DIR_Right }
-					]
-				},
 			}
 		}
 	);
@@ -636,29 +582,4 @@ public func EvalAct_SetActive(proplist props, proplist context)
 	// Set specific target if desired.
 	if (attack_target)
 		fx.target = attack_target;
-}
-
-public func EvalAct_SetNewHome(proplist props, proplist context)
-{
-	// User action: Set new home.
-	var enemy = UserAction->EvaluateValue("Object", props.Enemy, context);
-	var new_home = UserAction->EvaluatePosition(props.NewHome, context);
-	var new_home_dir = props.NewHomeDir;
-	if (!enemy)
-		return;
-	// Ensure enemy AI exists.
-	var fx = GetAI(enemy);
-	if (!fx)
-	{
-		fx = AddAI(enemy);
-		if (!fx || !enemy)
-			return;
-		// Create without attack command.
-		SetAutoSearchTarget(enemy, false);
-	}
-	fx.command = this.ExecuteIdle;
-	fx.home_x = new_home[0];
-	fx.home_y = new_home[1];
-	if (GetType(new_home_dir))
-		fx.home_dir = new_home_dir;
 }
