@@ -38,7 +38,7 @@ public func OnAddAI(proplist fx_ai)
 	SetHome(fx_ai.Target);
 	SetGuardRange(fx_ai.Target, fx_ai.home_x - fx_ai.GuardRangeX, fx_ai.home_y - fx_ai.GuardRangeY, fx_ai.GuardRangeX * 2, fx_ai.GuardRangeY * 2);
 	SetMaxAggroDistance(fx_ai.Target, fx_ai.MaxAggroDistance);
-	SetAutoSearchTarget(fx_ai.Target, true);
+	SetAutoSearchTarget(fx_ai.Target, true);	
 }
 
 
@@ -486,10 +486,13 @@ public func SetVehicle(object clonk, object new_vehicle)
 }
 
 
-local FxAIoverride = new FxAI
+/*-- Editor Properties --*/
+
+local FxAIDelegateFunctions = 
 {
 	SetAttackMode = func(proplist attack_mode)
 	{
+		Log("Set attack mode %v %v", this.control, this.Target);
 		// Called by editor delegate when attack mode is changed.
 		// For now, attack mode parameter delegates are not supported. Just set by name.
 		return this.control->SetAttackMode(this.Target, attack_mode.Identifier);
@@ -502,13 +505,33 @@ local FxAIoverride = new FxAI
 };
 
 
-/*-- Editor Properties --*/
+func EditorDelegate_SetAttackMode(proplist attack_mode)
+{
+	Log("Set attack mode %v %v", this.control, this.Target);
+	// Called by editor delegate when attack mode is changed.
+	// For now, attack mode parameter delegates are not supported. Just set by name.
+	return this.control->SetAttackMode(this.Target, attack_mode.Identifier);
+}
+
+
+func EditorDelegate_SetAttackPath(array attack_path)
+{
+	Log("Set attack path %v %v", this.control, this.Target);
+	// Called by editor delegate when attack mode is changed.
+	// For now, attack mode parameter delegates are not supported. Just set by name.
+	return this.control->SetAttackPath(this.Target, attack_path);
+}
 
 // Callback from the Definition()-call
 public func OnDefineAI(proplist def)
 {
 	_inherited(def);
 	
+	def.FxAI.SetAttackMode = this.EditorDelegate_SetAttackMode;
+	def.FxAI.SetAttackPath = this.EditorDelegate_SetAttackPath;
+	//AddProperties(FxAI, FxAIDelegateFunctions); // works, too
+
+
 	// Can be added to Clonk
 	AddEditorProp_AISelection(Clonk, AI_OpenClonk);
 	
