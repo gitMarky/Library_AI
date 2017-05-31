@@ -36,9 +36,6 @@ public func OnAddAI(proplist fx_ai)
 		fx_ai.vehicle = fx_ai.Target->GetActionTarget();
 	// Store whether the enemy is controlled by a commander.
 	fx_ai.commander = fx_ai.Target.commander;
-
-	// Add AI default settings.	
-	SetAttackMode(fx_ai.Target, "Default"); // also binds inventory
 }
 
 
@@ -61,8 +58,6 @@ public func OnSaveScenarioAI(proplist fx_ai, proplist props)
 {
 	_inherited(fx_ai, props);
 
-	if (fx_ai.attack_mode.Identifier != "Default")
-		props->AddCall(SAVESCEN_ID_AI, fx_ai.control, "SetAttackMode", fx_ai.Target, Format("%v", fx_ai.attack_mode.Identifier));
 	if (fx_ai.attack_path)
 		props->AddCall(SAVESCEN_ID_AI, fx_ai.control, "SetAttackPath", fx_ai.Target, fx_ai.attack_path);
 	if (fx_ai.ally_alert_range)
@@ -328,24 +323,6 @@ private func FindInventoryWeaponJavelin(effect fx)
 
 
 /*-- Public interface --*/
-
-// Set the current inventory to be removed when the clonk dies. Only works if clonk has an AI.
-public func BindInventory(object clonk)
-{
-	if (GetType(this) != C4V_Def)
-		Log("WARNING: BindInventory(%v) not called from definition context but from %v", clonk, this);
-	var fx_ai = GetAI(clonk);
-	if (!fx_ai)
-		return false;
-	var cnt = clonk->ContentsCount();
-	fx_ai.bound_weapons = CreateArray(cnt);
-	for (var i = 0; i < cnt; ++i)
-		fx_ai.bound_weapons[i] = clonk->Contents(i);
-	return true;
-}
-
-
-
 
 // Set range in which, on first encounter, allied AI clonks get the same aggro target set.
 public func SetAllyAlertRange(object clonk, int new_range)
