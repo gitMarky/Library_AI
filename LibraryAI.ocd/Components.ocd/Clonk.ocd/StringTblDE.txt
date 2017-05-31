@@ -1,2 +1,0 @@
-Enemy=Gegner
-EnemyHelp=Welcher Gegner angegriffen werden soll. Wenn nicht angegeben, greift der Gegner den nächsten Clonk an.

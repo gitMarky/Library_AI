@@ -46,12 +46,3 @@ public func CheckHandsAction(effect fx)
 	// Probably hands busy. Just wait.
 	return false;
 }
-
-
-// Gets an evaluator for the editor: Clonks
-public func UserAction_EnemyEvaluator()
-{
-	var enemy_evaluator = UserAction->GetObjectEvaluator("IsClonk", "$Enemy$", "$EnemyHelp$");
-	enemy_evaluator.Priority = 100;
-	return enemy_evaluator;
-}

@@ -1,14 +1,8 @@
-GuardRange=Guarded area
-MaxAggroDistance=Attack radius
 IgnoreAllies=Ignore allies
 Active=Active
 ActiveHelp=Whether the AI controls the clonk currently. An inactive KI can be reactivated via the 'AI activate', for example in a sequence.
-AutoSearchTarget=Auto-search target
-AutoSearchTargetHelp=Looks for enemies automatically if true. If false, enemies must be provided via a script sequence.
 SetAIActivated=AI activate
 SetAIActivatedHelp=Activates an enemy AI for a clonk. AI will be created if necessary.
-AttackTarget=Attack target
-AttackTargetHelp=If specified, this enemy is attacked by the AI clonk. If not specified, the nearest enemy will be attacked.
 Status=Active
 StatusHelp=Whether to activate or deactivate the AI.
 AttackPath=Attack path

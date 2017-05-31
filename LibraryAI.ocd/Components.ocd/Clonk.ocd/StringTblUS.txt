@@ -1,2 +1,0 @@
-Enemy=Enemy
-EnemyHelp=Which enemy to attack. If unspecified, attacks the nearest clonk.

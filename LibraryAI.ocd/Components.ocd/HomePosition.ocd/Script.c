@@ -29,6 +29,16 @@ public func SetHome(object clonk, int x, int y, int dir)
 
 /*-- Callbacks --*/
 
+// Callback from the effect Construction()-call
+public func OnAddAI(proplist fx_ai)
+{
+	_inherited(fx_ai);
+
+	// Add AI default settings.	
+	SetHome(fx_ai.Target);
+}
+
+
 // Callback from the effect SaveScen()-call
 public func OnSaveScenarioAI(proplist fx_ai, proplist props)
 {
@@ -80,6 +90,7 @@ public func OnDefineAI(proplist def)
 		}
 	);
 }
+
 
 public func EvalAct_SetNewHome(proplist props, proplist context)
 {

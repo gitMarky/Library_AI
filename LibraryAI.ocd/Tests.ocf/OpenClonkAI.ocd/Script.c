@@ -18,6 +18,7 @@
 // Include additional components
 #include AI_HelperClonk
 #include AI_HomePosition
+#include AI_AttackEnemy
 
 // Timer interval for the effect
 public func GetTimerInterval(){	return 3;}
@@ -26,6 +27,8 @@ public func GetTimerInterval(){	return 3;}
 // Callback from the effect Construction()-call
 public func OnAddAI(proplist fx_ai)
 {
+	_inherited(fx_ai);
+
 	// Set the timer interval (the controller has an interval of 1)
 	fx_ai.Interval = 3;
 	// Store the vehicle the AI is using.
@@ -36,10 +39,6 @@ public func OnAddAI(proplist fx_ai)
 
 	// Add AI default settings.	
 	SetAttackMode(fx_ai.Target, "Default"); // also binds inventory
-	SetHome(fx_ai.Target);
-	SetGuardRange(fx_ai.Target, fx_ai.home_x - fx_ai.GuardRangeX, fx_ai.home_y - fx_ai.GuardRangeY, fx_ai.GuardRangeX * 2, fx_ai.GuardRangeY * 2);
-	SetMaxAggroDistance(fx_ai.Target, fx_ai.MaxAggroDistance);
-	SetAutoSearchTarget(fx_ai.Target, true);	
 }
 
 
@@ -66,15 +65,8 @@ public func OnSaveScenarioAI(proplist fx_ai, proplist props)
 		props->AddCall(SAVESCEN_ID_AI, fx_ai.control, "SetAttackMode", fx_ai.Target, Format("%v", fx_ai.attack_mode.Identifier));
 	if (fx_ai.attack_path)
 		props->AddCall(SAVESCEN_ID_AI, fx_ai.control, "SetAttackPath", fx_ai.Target, fx_ai.attack_path);
-	props->AddCall(SAVESCEN_ID_AI, fx_ai.control, "SetGuardRange", fx_ai.Target, fx_ai.guard_range.x, fx_ai.guard_range.y, fx_ai.guard_range.wdt, fx_ai.guard_range.hgt);
-	if (fx_ai.max_aggro_distance != fx_ai.control.MaxAggroDistance)
-		props->AddCall(SAVESCEN_ID_AI, fx_ai.control, "SetMaxAggroDistance", fx_ai.Target, fx_ai.max_aggro_distance);
 	if (fx_ai.ally_alert_range)
 		props->AddCall(SAVESCEN_ID_AI, fx_ai.control, "SetAllyAlertRange", fx_ai.Target, fx_ai.ally_alert_range);
-	if (!fx_ai.auto_search_target)
-		props->AddCall(SAVESCEN_ID_AI, fx_ai.control, "SetAutoSearchTarget", fx_ai.Target, false);
-	if (fx_ai.encounter_cb)
-		props->AddCall(SAVESCEN_ID_AI, fx_ai.control, "SetEncounterCB", fx_ai.Target, Format("%v", fx_ai.encounter_cb));
 }
 
 
@@ -333,13 +325,7 @@ private func FindInventoryWeaponJavelin(effect fx)
 
 // -------------------------------------------------------------------------------------------------
 
-// Enemy spawn definition depends on this
-local DefinitionPriority = 50;
 
-// AI Settings.
-local MaxAggroDistance = 200; // Lose sight to target if it is this far away (unless we're ranged - then always guard the range rect).
-local GuardRangeX = 300; // Search targets this far away in either direction (searching in rectangle).
-local GuardRangeY = 150; // Search targets this far away in either direction (searching in rectangle).
 
 /*-- Public interface --*/
 
@@ -359,56 +345,6 @@ public func BindInventory(object clonk)
 }
 
 
-// Enable/disable auto-searching of targets.
-public func SetAutoSearchTarget(object clonk, bool new_auto_search_target)
-{
-	if (GetType(this) != C4V_Def)
-		Log("WARNING: SetAutoSearchTarget(%v, %v) not called from definition context but from %v", clonk, new_auto_search_target, this);
-	var fx_ai = GetAI(clonk);
-	if (!fx_ai)
-		return false;
-	fx_ai.auto_search_target = new_auto_search_target;
-	return true;
-}
-
-
-// Set the guard range to the provided rectangle.
-public func SetGuardRange(object clonk, int x, int y, int wdt, int hgt)
-{
-	if (GetType(this) != C4V_Def)
-		Log("WARNING: SetGuardRange(%v, %d, %d, %d, %d) not called from definition context but from %v", clonk, x, y, wdt, hgt, this);
-	var fx_ai = GetAI(clonk);
-	if (!fx_ai)
-		return false;
-	// Clip to landscape size.
-	if (x < 0)
-	{
-		wdt += x;
-		x = 0;
-	}
-	if (y < 0)
-	{
-		hgt += y;
-		y = 0;
-	}
-	wdt = Min(wdt, LandscapeWidth() - x);
-	hgt = Min(hgt, LandscapeHeight() - y);
-	fx_ai.guard_range = {x = x, y = y, wdt = wdt, hgt = hgt};
-	return true;
-}
-
-
-// Set the maximum distance the enemy will follow an attacking clonk.
-public func SetMaxAggroDistance(object clonk, int max_dist)
-{
-	if (GetType(this) != C4V_Def)
-		Log("WARNING: SetMaxAggroDistance(%v, %d) not called from definition context but from %v", clonk, max_dist, this);
-	var fx_ai = GetAI(clonk);
-	if (!fx_ai)
-		return false;
-	fx_ai.max_aggro_distance = max_dist;
-	return true;
-}
 
 
 // Set range in which, on first encounter, allied AI clonks get the same aggro target set.
@@ -420,21 +356,6 @@ public func SetAllyAlertRange(object clonk, int new_range)
 	if (!fx_ai)
 		return false;
 	fx_ai.ally_alert_range = new_range;
-	return true;
-}
-
-
-// Set callback function name to be called in game script when this AI is first encountered
-// Callback function first parameter is (this) AI clonk, second parameter is player clonk.
-// The callback should return true to be cleared and not called again. Otherwise, it will be called every time a new target is found.
-public func SetEncounterCB(object clonk, string cb_fn)
-{
-	if (GetType(this) != C4V_Def)
-		Log("WARNING: SetEncounterCB(%v, %s) not called from definition context but from %v", clonk, cb_fn, this);
-	var fx_ai = GetAI(clonk);
-	if (!fx_ai)
-		return false;
-	fx_ai.encounter_cb = cb_fn;
 	return true;
 }
 
@@ -517,11 +438,8 @@ public func OnDefineAI(proplist def)
 	// Set the additional editor properties
 	var additional_props =
 	{
-		guard_range = { Name = "$GuardRange$", Type = "rect", Storage = "proplist", Color = 0xff00, Relative = false },
 		ignore_allies = { Name = "$IgnoreAllies$", Type = "bool" },
-		max_aggro_distance = { Name = "$MaxAggroDistance$", Type = "circle", Color = 0x808080 },
 		active = { Name = "$Active$", EditorHelp = "$ActiveHelp$", Type = "bool", Priority = 50, AsyncGet = "GetActive", Set = "SetActive" },
-		auto_search_target = { Name = "$AutoSearchTarget$", EditorHelp = "$AutoSearchTargetHelp$", Type = "bool" },
 		attack_path = { Name = "$AttackPath$", EditorHelp = "$AttackPathHelp$", Type = "enum", Set = "SetAttackPath", Options = [
 			{ Name="$None$" },
 			{ Name="$AttackPath$", Type=C4V_Array, Value = [{X = 0, Y = 0}], Delegate =
@@ -551,7 +469,7 @@ public func OnDefineAI(proplist def)
 			Display = "{{Enemy}}: {{Status}} ({{AttackTarget}})",
 			EditorProps = {
 				Enemy = this->~UserAction_EnemyEvaluator(),
-				AttackTarget = UserAction->GetObjectEvaluator("IsClonk", "$AttackTarget$", "$AttackTargetHelp$"),
+				AttackTarget = this->~UserAction_AttackTargetEvaluator(),
 				Status = new UserAction.Evaluator.Boolean { Name = "$Status$" }
 			}
 		}
