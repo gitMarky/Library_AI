@@ -29,6 +29,8 @@ public func OnSaveScenarioAI(proplist fx_ai, proplist props)
 }
 
 
+/*-- Editor Properties --*/
+
 // Callback from the Definition()-call
 public func OnDefineAI(proplist def)
 {
@@ -53,11 +55,8 @@ public func OnDefineAI(proplist def)
 }
 
 
-/*-- Editor Properties --*/
-
 func EditorDelegate_SetAttackPath(array attack_path)
 {
-	Log("Set attack path %v %v", this.control, this.Target);
 	// Called by editor delegate when attack mode is changed.
 	// For now, attack mode parameter delegates are not supported. Just set by name.
 	return this.control->SetAttackPath(this.Target, attack_path);

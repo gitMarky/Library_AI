@@ -38,7 +38,6 @@ public func OnDefineAI(proplist def)
 
 func EditorDelegate_SetAttackMode(proplist attack_mode)
 {
-	Log("Set attack mode %v %v", this.control, this.Target);
 	// Called by editor delegate when attack mode is changed.
 	// For now, attack mode parameter delegates are not supported. Just set by name.
 	return this.control->SetAttackMode(this.Target, attack_mode.Identifier);
