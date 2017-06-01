@@ -42,6 +42,8 @@ public func OnAddAI(proplist fx_ai)
 // Callback from the effect Destruction()-call
 public func OnRemoveAI(proplist fx_ai, int reason)
 {
+	_inherited(fx_ai, reason);
+
 	// Remove weapons on death.
 	if (reason == FX_Call_RemoveDeath)
 	{
@@ -58,8 +60,6 @@ public func OnSaveScenarioAI(proplist fx_ai, proplist props)
 {
 	_inherited(fx_ai, props);
 
-	if (fx_ai.attack_path)
-		props->AddCall(SAVESCEN_ID_AI, fx_ai.control, "SetAttackPath", fx_ai.Target, fx_ai.attack_path);
 	if (fx_ai.ally_alert_range)
 		props->AddCall(SAVESCEN_ID_AI, fx_ai.control, "SetAllyAlertRange", fx_ai.Target, fx_ai.ally_alert_range);
 }
@@ -320,8 +320,6 @@ private func FindInventoryWeaponJavelin(effect fx)
 
 // -------------------------------------------------------------------------------------------------
 
-
-
 /*-- Public interface --*/
 
 // Set range in which, on first encounter, allied AI clonks get the same aggro target set.
@@ -333,19 +331,6 @@ public func SetAllyAlertRange(object clonk, int new_range)
 	if (!fx_ai)
 		return false;
 	fx_ai.ally_alert_range = new_range;
-	return true;
-}
-
-
-// Set attack path
-public func SetAttackPath(object clonk, array new_attack_path)
-{
-	if (GetType(this) != C4V_Def)
-		Log("WARNING: SetAttackPath(%v, %v) not called from definition context but from %v", clonk, new_attack_path, this);
-	var fx_ai = GetAI(clonk);
-	if (!fx_ai)
-		return false;
-	fx_ai.attack_path = new_attack_path;
 	return true;
 }
 
@@ -365,23 +350,6 @@ public func SetVehicle(object clonk, object new_vehicle)
 
 /*-- Editor Properties --*/
 
-local FxAIDelegateFunctions = 
-{
-	SetAttackMode = func(proplist attack_mode)
-	{
-		Log("Set attack mode %v %v", this.control, this.Target);
-		// Called by editor delegate when attack mode is changed.
-		// For now, attack mode parameter delegates are not supported. Just set by name.
-		return this.control->SetAttackMode(this.Target, attack_mode.Identifier);
-	},
-	SetAttackPath = func(array attack_path)
-	{
-		// Called by editor delegate when attack path is changed.
-		return this.control->SetAttackPath(this.Target, attack_path);
-	},
-};
-
-
 func EditorDelegate_SetAttackMode(proplist attack_mode)
 {
 	Log("Set attack mode %v %v", this.control, this.Target);
@@ -390,23 +358,12 @@ func EditorDelegate_SetAttackMode(proplist attack_mode)
 	return this.control->SetAttackMode(this.Target, attack_mode.Identifier);
 }
 
-
-func EditorDelegate_SetAttackPath(array attack_path)
-{
-	Log("Set attack path %v %v", this.control, this.Target);
-	// Called by editor delegate when attack mode is changed.
-	// For now, attack mode parameter delegates are not supported. Just set by name.
-	return this.control->SetAttackPath(this.Target, attack_path);
-}
-
 // Callback from the Definition()-call
 public func OnDefineAI(proplist def)
 {
 	_inherited(def);
 	
 	def.FxAI.SetAttackMode = this.EditorDelegate_SetAttackMode;
-	def.FxAI.SetAttackPath = this.EditorDelegate_SetAttackPath;
-	//AddProperties(FxAI, FxAIDelegateFunctions); // works, too
 
 
 	// Can be added to Clonk
@@ -417,12 +374,6 @@ public func OnDefineAI(proplist def)
 	{
 		ignore_allies = { Name = "$IgnoreAllies$", Type = "bool" },
 		active = { Name = "$Active$", EditorHelp = "$ActiveHelp$", Type = "bool", Priority = 50, AsyncGet = "GetActive", Set = "SetActive" },
-		attack_path = { Name = "$AttackPath$", EditorHelp = "$AttackPathHelp$", Type = "enum", Set = "SetAttackPath", Options = [
-			{ Name="$None$" },
-			{ Name="$AttackPath$", Type=C4V_Array, Value = [{X = 0, Y = 0}], Delegate =
-				{ Name="$AttackPath$", EditorHelp="$AttackPathHelp$", Type="polyline", StartFromObject=true, DrawArrows=true, Color=0xdf0000, Relative=false }
-			}
-		] },
 	};
 	
 	AddProperties(def.FxAI.EditorProps, additional_props);
