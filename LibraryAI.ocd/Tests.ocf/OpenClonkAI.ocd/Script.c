@@ -2,6 +2,8 @@
 	Open Clonk AI implemented with this library.
 */
 
+// Include the basic functionality
+#include AI_Controller
 // Include the different parts of the AI.
 #include AI_Appearance
 #include AI_Debugging
@@ -13,9 +15,7 @@
 #include AI_TargetFinding
 #include AI_Vehicles
 #include AI_AttackModes
-// Include the basic functionality
-#include AI_Controller
-// Include additional components
+// Include additional components from the library
 #include AI_HelperClonk
 #include AI_HomePosition
 #include AI_AttackEnemy
@@ -25,16 +25,6 @@
 
 // Timer interval for the effect
 public func GetTimerInterval(){	return 3;}
-
-
-// Callback from the effect Construction()-call
-public func OnAddAI(proplist fx_ai)
-{
-	_inherited(fx_ai);
-
-	// Set the timer interval (the controller has an interval of 1)
-	fx_ai.Interval = 3;
-}
 
 
 /*-- Editor Properties --*/
