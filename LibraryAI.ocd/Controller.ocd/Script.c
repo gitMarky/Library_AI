@@ -174,6 +174,7 @@ local FxAI = new Effect
 		return this.Interval != 0;	
 	},
 	EditorProps = {
+		active = { Name = "$Active$", EditorHelp = "$ActiveHelp$", Type = "bool", Priority = 50, AsyncGet = "GetActive", Set = "SetActive" },
 	},
 	// Save this effect and the AI for scenarios.
 	SaveScen = func(proplist props)
@@ -324,15 +325,7 @@ public func OnSaveScenarioAI(proplist fx_ai, proplist props)
 public func OnDefineAI(proplist def)
 {
 	_inherited(def);
-	
-	// Set the additional editor properties
-	var additional_props =
-	{
-		active = { Name = "$Active$", EditorHelp = "$ActiveHelp$", Type = "bool", Priority = 50, AsyncGet = "GetActive", Set = "SetActive" },
-	};
-	
-	AddProperties(def.FxAI.EditorProps, additional_props);
-	
+		
 	// Add AI user actions.
 	UserAction->AddEvaluator("Action", "Clonk", "$SetAIActivated$", "$SetAIActivatedHelp$", "ai_set_activated", [def, def.EvalAct_SetActive], 
 		{
