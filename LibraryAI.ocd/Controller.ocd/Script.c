@@ -151,11 +151,23 @@ local FxAI = new Effect
 		// So let's just keep it at alert state for now.
 		if (dmg < 0) 
 			this.alert = this.time;
+		
+		this.control->~OnDamageAI(this, dmg, cause);	
+		
 		return dmg;
 	},
 	SetActive = func(bool active)
 	{
-		this.Interval = (this.control->~GetTimerInterval() ?? 1) * active;	
+		this.Interval = (this.control->~GetTimerInterval() ?? 1) * active;
+		
+		if (active)
+		{
+			this.control->~OnActivateAI(this);
+		}
+		else
+		{
+			this.control->~OnDeactivateAI(this);
+		}
 	},
 	GetActive = func()
 	{
@@ -191,16 +203,6 @@ public func Execute(effect fx, int time) // TODO: Adjust
 	return this->Call(fx.strategy, fx);
 }
 
-
-// Selects an item the clonk is about to use.
-public func SelectItem(effect fx, object item)
-{
-	if (!item)
-		return;
-	if (item->Contained() != fx.Target)
-		return;
-	fx.Target->SetHandItemPos(0, fx.Target->GetItemPos(item));
-}
 
 /*-- Editor Properties --*/
 
@@ -287,6 +289,26 @@ public func OnRemoveAI(proplist fx_ai, int reason)
 {
 	// called by the effect Destruction()
 	_inherited(fx_ai, reason);
+}
+
+
+// Callback when the AI is activated by a trigger
+public func OnActivateAI(proplist fx_ai)
+{
+	_inherited(fx_ai);
+}
+
+// Callback when the AI is deactivated by a trigger
+public func OnDectivateAI(proplist fx_ai)
+{
+	_inherited(fx_ai);
+}
+
+
+// Callback when the AI is damaged
+public func OnDamageAI(proplist fx_ai, int damage, int cause)
+{
+	_inherited(fx_ai, damage, cause);
 }
 
 
