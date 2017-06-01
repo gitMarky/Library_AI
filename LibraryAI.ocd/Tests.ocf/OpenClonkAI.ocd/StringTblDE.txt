@@ -5,6 +5,3 @@ SetAIActivated=KI aktivieren
 SetAIActivatedHelp=Aktiviert die Gegner-KI für ein Objekt. Wenn keine KI aktiviert ist, wird sie für das Objekt erstellt.
 Status=Aktiviert
 StatusHelp=Ob die KI aktiviert oder deaktiviert wird.
-AttackPath=Angriffspfad
-AttackPathHelp=Pfad, entlang dessen sich der KI-Gegner berwegt. Befindet sich ein Gebaeude auf einem Eckpunkt des Pfades, greift der Clonk das Gebaeude an.
-None=Keiner
