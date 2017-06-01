@@ -278,6 +278,7 @@ local Plane = 300;
 public func OnAddAI(proplist fx_ai)
 {
 	// called by the effect Construction()
+	_inherited(fx_ai);
 }
 
 
@@ -285,6 +286,7 @@ public func OnAddAI(proplist fx_ai)
 public func OnRemoveAI(proplist fx_ai, int reason)
 {
 	// called by the effect Destruction()
+	_inherited(fx_ai, reason);
 }
 
 
@@ -292,6 +294,7 @@ public func OnRemoveAI(proplist fx_ai, int reason)
 public func OnSaveScenarioAI(proplist fx_ai, proplist props)
 {
 	// called by the effect SaveScen()
+	_inherited(fx_ai, props);
 }
 
 
@@ -299,4 +302,5 @@ public func OnSaveScenarioAI(proplist fx_ai, proplist props)
 public func OnDefineAI(proplist type)
 {
 	// does nothing
+	_inherited(type);
 }
