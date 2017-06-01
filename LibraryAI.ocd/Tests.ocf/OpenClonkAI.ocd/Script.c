@@ -350,22 +350,11 @@ public func SetVehicle(object clonk, object new_vehicle)
 
 /*-- Editor Properties --*/
 
-func EditorDelegate_SetAttackMode(proplist attack_mode)
-{
-	Log("Set attack mode %v %v", this.control, this.Target);
-	// Called by editor delegate when attack mode is changed.
-	// For now, attack mode parameter delegates are not supported. Just set by name.
-	return this.control->SetAttackMode(this.Target, attack_mode.Identifier);
-}
-
 // Callback from the Definition()-call
 public func OnDefineAI(proplist def)
 {
 	_inherited(def);
 	
-	def.FxAI.SetAttackMode = this.EditorDelegate_SetAttackMode;
-
-
 	// Can be added to Clonk
 	AddEditorProp_AISelection(Clonk, AI_OpenClonk);
 	
@@ -378,8 +367,6 @@ public func OnDefineAI(proplist def)
 	
 	AddProperties(def.FxAI.EditorProps, additional_props);
 	
-	// Set the other options
-	def->DefinitionAttackModes(def);
 	// Add AI user actions.
 	UserAction->AddEvaluator("Action", "Clonk", "$SetAIActivated$", "$SetAIActivatedHelp$", "ai_set_activated", [def, def.EvalAct_SetActive], 
 		{
