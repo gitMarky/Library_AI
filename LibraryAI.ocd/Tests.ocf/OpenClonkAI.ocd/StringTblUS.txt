@@ -1,4 +1,3 @@
-IgnoreAllies=Ignore allies
 Active=Active
 ActiveHelp=Whether the AI controls the clonk currently. An inactive KI can be reactivated via the 'AI activate', for example in a sequence.
 SetAIActivated=AI activate

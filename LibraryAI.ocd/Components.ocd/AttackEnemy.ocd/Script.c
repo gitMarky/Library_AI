@@ -15,6 +15,18 @@ local GuardRangeY = 150; // Search targets this far away in either direction (se
 /*-- Public interface --*/
 
 
+public func SetAllyAlertRange(object clonk, int new_range)
+{
+	if (GetType(this) != C4V_Def)
+		Log("WARNING: SetAllyAlertRange(%v, %d) not called from definition context but from %v", clonk, new_range, this);
+	var fx_ai = this->GetAI(clonk);
+	if (!fx_ai)
+		return false;
+	fx_ai.ally_alert_range = new_range;
+	return true;
+}
+
+
 // Set callback function name to be called in game script when this AI is first encountered
 // Callback function first parameter is (this) AI clonk, second parameter is player clonk.
 // The callback should return true to be cleared and not called again. Otherwise, it will be called every time a new target is found.
@@ -92,6 +104,9 @@ public func OnAddAI(proplist fx_ai)
 	SetGuardRange(fx_ai.Target, fx_ai.home_x - fx_ai.GuardRangeX, fx_ai.home_y - fx_ai.GuardRangeY, fx_ai.GuardRangeX * 2, fx_ai.GuardRangeY * 2);
 	SetMaxAggroDistance(fx_ai.Target, fx_ai.MaxAggroDistance);
 	SetAutoSearchTarget(fx_ai.Target, true);	
+	
+	// Store whether the enemy is controlled by a commander.
+	fx_ai.commander = fx_ai.Target.commander;
 }
 
 // Callback from the Definition()-call
@@ -102,6 +117,7 @@ public func OnDefineAI(proplist def)
 	// Set the additional editor properties
 	var additional_props =
 	{
+		ignore_allies = { Name = "$IgnoreAllies$", Type = "bool" },
 		guard_range = { Name = "$GuardRange$", Type = "rect", Storage = "proplist", Color = 0xff00, Relative = false },
 		max_aggro_distance = { Name = "$MaxAggroDistance$", Type = "circle", Color = 0x808080 },
 		auto_search_target = { Name = "$AutoSearchTarget$", EditorHelp = "$AutoSearchTargetHelp$", Type = "bool" },
@@ -116,6 +132,8 @@ public func OnSaveScenarioAI(proplist fx_ai, proplist props)
 {
 	_inherited(fx_ai, props);
 
+	if (fx_ai.ally_alert_range)
+		props->AddCall(SAVESCEN_ID_AI, fx_ai.control, "SetAllyAlertRange", fx_ai.Target, fx_ai.ally_alert_range);
 	props->AddCall(SAVESCEN_ID_AI, fx_ai.control, "SetGuardRange", fx_ai.Target, fx_ai.guard_range.x, fx_ai.guard_range.y, fx_ai.guard_range.wdt, fx_ai.guard_range.hgt);
 	if (fx_ai.max_aggro_distance != fx_ai.control.MaxAggroDistance)
 		props->AddCall(SAVESCEN_ID_AI, fx_ai.control, "SetMaxAggroDistance", fx_ai.Target, fx_ai.max_aggro_distance);

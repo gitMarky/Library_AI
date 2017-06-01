@@ -1,3 +1,4 @@
+IgnoreAllies=Mitspieler ignorieren
 GuardRange=Bewachter Bereich
 MaxAggroDistance=Angriffsradius
 AutoSearchTarget=Ziel automatisch suchen

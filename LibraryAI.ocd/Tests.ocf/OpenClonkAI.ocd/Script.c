@@ -35,18 +35,6 @@ public func OnAddAI(proplist fx_ai)
 	// Store the vehicle the AI is using.
 	if (fx_ai.Target->GetProcedure() == "PUSH")
 		fx_ai.vehicle = fx_ai.Target->GetActionTarget();
-	// Store whether the enemy is controlled by a commander.
-	fx_ai.commander = fx_ai.Target.commander;
-}
-
-
-// Callback from the effect SaveScen()-call
-public func OnSaveScenarioAI(proplist fx_ai, proplist props)
-{
-	_inherited(fx_ai, props);
-
-	if (fx_ai.ally_alert_range)
-		props->AddCall(SAVESCEN_ID_AI, fx_ai.control, "SetAllyAlertRange", fx_ai.Target, fx_ai.ally_alert_range);
 }
 
 
@@ -307,18 +295,6 @@ private func FindInventoryWeaponJavelin(effect fx)
 
 /*-- Public interface --*/
 
-// Set range in which, on first encounter, allied AI clonks get the same aggro target set.
-public func SetAllyAlertRange(object clonk, int new_range)
-{
-	if (GetType(this) != C4V_Def)
-		Log("WARNING: SetAllyAlertRange(%v, %d) not called from definition context but from %v", clonk, new_range, this);
-	var fx_ai = GetAI(clonk);
-	if (!fx_ai)
-		return false;
-	fx_ai.ally_alert_range = new_range;
-	return true;
-}
-
 
 // Set controlled vehicle
 public func SetVehicle(object clonk, object new_vehicle)
@@ -346,7 +322,6 @@ public func OnDefineAI(proplist def)
 	// Set the additional editor properties
 	var additional_props =
 	{
-		ignore_allies = { Name = "$IgnoreAllies$", Type = "bool" },
 		active = { Name = "$Active$", EditorHelp = "$ActiveHelp$", Type = "bool", Priority = 50, AsyncGet = "GetActive", Set = "SetActive" },
 	};
 	
