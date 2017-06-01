@@ -299,8 +299,67 @@ public func OnSaveScenarioAI(proplist fx_ai, proplist props)
 
 
 // Callback from the Definition()-call
-public func OnDefineAI(proplist type)
+public func OnDefineAI(proplist def)
 {
-	// does nothing
-	_inherited(type);
+	_inherited(def);
+	
+	// Set the additional editor properties
+	var additional_props =
+	{
+		active = { Name = "$Active$", EditorHelp = "$ActiveHelp$", Type = "bool", Priority = 50, AsyncGet = "GetActive", Set = "SetActive" },
+	};
+	
+	AddProperties(def.FxAI.EditorProps, additional_props);
+	
+	// Add AI user actions.
+	UserAction->AddEvaluator("Action", "Clonk", "$SetAIActivated$", "$SetAIActivatedHelp$", "ai_set_activated", [def, def.EvalAct_SetActive], 
+		{
+			Enemy = nil,
+			AttackTarget = {
+				Function= "triggering_clonk"
+			},
+			Status = {
+				Function = "bool_constant",
+				Value = true
+			}
+		},
+		{
+			Type = "proplist",
+			Display = "{{Enemy}}: {{Status}} ({{AttackTarget}})",
+			EditorProps = {
+				Enemy = this->~UserAction_EnemyEvaluator(),
+				AttackTarget = this->~UserAction_AttackTargetEvaluator(),
+				Status = new UserAction.Evaluator.Boolean { Name = "$Status$" }
+			}
+		}
+	);
+}
+
+
+/*-- Editor Properties --*/
+
+public func EvalAct_SetActive(proplist props, proplist context)
+{
+	// User action: Activate enemy AI.
+	var enemy = UserAction->EvaluateValue("Object", props.Enemy, context);
+	var attack_target = UserAction->EvaluateValue("Object", props.AttackTarget, context);
+	var status = UserAction->EvaluateValue("Boolean", props.Status, context);
+	if (!enemy)
+		return;
+	// Ensure enemy AI exists
+	var fx = GetAI(enemy);
+	if (!fx)
+	{
+		// Deactivated? Then we don't need an AI effect.
+		if (!status)
+			return;
+		fx = AddAI(enemy);
+		if (!fx || !enemy)
+			return;
+	}
+	// Set activation.
+	fx->SetActive(status);
+	// Set specific target if desired.
+	if (attack_target)
+		fx.target = attack_target;
 }
