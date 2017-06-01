@@ -41,8 +41,6 @@ public func OnDefineAI(proplist def)
 	// Set the additional editor properties
 	var additional_props =
 	{
-		ignore_allies = { Name = "$IgnoreAllies$", Type = "bool" },
-		active = { Name = "$Active$", EditorHelp = "$ActiveHelp$", Type = "bool", Priority = 50, AsyncGet = "GetActive", Set = "SetActive" },
 		attack_path = { Name = "$AttackPath$", EditorHelp = "$AttackPathHelp$", Type = "enum", Set = "SetAttackPath", Options = [
 			{ Name="$None$" },
 			{ Name="$AttackPath$", Type=C4V_Array, Value = [{X = 0, Y = 0}], Delegate =
