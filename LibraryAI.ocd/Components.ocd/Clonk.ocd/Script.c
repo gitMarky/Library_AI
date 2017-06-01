@@ -47,19 +47,3 @@ public func CheckHandsAction(effect fx)
 	return false;
 }
 
-
-// Set the current inventory to be removed when the clonk dies. Only works if clonk has an AI.
-public func BindInventory(object clonk)
-{
-	if (GetType(this) != C4V_Def)
-		Log("WARNING: BindInventory(%v) not called from definition context but from %v", clonk, this);
-	var fx_ai = this->GetAI(clonk);
-	if (!fx_ai)
-		return false;
-	var cnt = clonk->ContentsCount();
-	fx_ai.bound_weapons = CreateArray(cnt);
-	for (var i = 0; i < cnt; ++i)
-		fx_ai.bound_weapons[i] = clonk->Contents(i);
-	return true;
-}
-

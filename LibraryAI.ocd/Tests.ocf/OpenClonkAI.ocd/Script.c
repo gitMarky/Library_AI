@@ -19,6 +19,7 @@
 #include AI_HelperClonk
 #include AI_HomePosition
 #include AI_AttackEnemy
+#include AI_Inventory
 
 // Timer interval for the effect
 public func GetTimerInterval(){	return 3;}
@@ -36,22 +37,6 @@ public func OnAddAI(proplist fx_ai)
 		fx_ai.vehicle = fx_ai.Target->GetActionTarget();
 	// Store whether the enemy is controlled by a commander.
 	fx_ai.commander = fx_ai.Target.commander;
-}
-
-
-// Callback from the effect Destruction()-call
-public func OnRemoveAI(proplist fx_ai, int reason)
-{
-	_inherited(fx_ai, reason);
-
-	// Remove weapons on death.
-	if (reason == FX_Call_RemoveDeath)
-	{
-		if (fx_ai.bound_weapons)
-			for (var obj in fx_ai.bound_weapons)
-				if (obj && obj->Contained() == fx_ai.Target)
-					obj->RemoveObject();
-	}
 }
 
 
