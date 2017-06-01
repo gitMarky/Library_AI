@@ -37,6 +37,18 @@ public func OnAddAI(proplist fx_ai)
 }
 
 
+/*-- Editor Properties --*/
+
+// Callback from the Definition()-call
+public func OnDefineAI(proplist def)
+{
+	_inherited(def);
+	
+	// Can be added to Clonk
+	AddEditorProp_AISelection(Clonk, AI_OpenClonk);
+}
+
+
 /*-- AI Execution --*/
 
 public func Execute(effect fx, int time)
@@ -288,17 +300,4 @@ private func FindInventoryWeaponJavelin(effect fx)
 		fx.ranged=true;
 		return true;
 	}
-}
-
-// -------------------------------------------------------------------------------------------------
-
-/*-- Editor Properties --*/
-
-// Callback from the Definition()-call
-public func OnDefineAI(proplist def)
-{
-	_inherited(def);
-	
-	// Can be added to Clonk
-	AddEditorProp_AISelection(Clonk, AI_OpenClonk);
 }
