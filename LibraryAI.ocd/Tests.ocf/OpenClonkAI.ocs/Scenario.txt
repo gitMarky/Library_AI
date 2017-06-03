@@ -3,7 +3,6 @@ Title=AI Test
 Version=8,0
 
 [Definitions]
-Definition1=Objects.ocd
 Definition2=LibraryAI.ocd
 
 [Landscape]
