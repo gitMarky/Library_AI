@@ -1,0 +1,12 @@
+[Head]
+Title=Test
+Version=8,0
+
+[Definitions]
+Definition2=LibraryAI.ocd
+
+[Landscape]
+MapWidth=20
+
+[Landscape]
+NoScan=1
