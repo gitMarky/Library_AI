@@ -132,6 +132,11 @@ local FxAI = new Effect
 		return this.ai;
 	},
 
+	GetControl = func()
+	{
+		return this.control;
+	},
+
 	Timer = func(int time)
 	{
 		// Execute the AI in the clonk.
