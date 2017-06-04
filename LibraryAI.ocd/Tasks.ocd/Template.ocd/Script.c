@@ -19,11 +19,3 @@ private func CreateTask()
 			Execute = this.Execute,
 	};
 }
-
-private func CanAddCommand(object agent)
-{
-	if (agent->GetCommand()) return false;
-	if (agent->GetAction() == "Walk") return true;
-	
-	return true;
-}

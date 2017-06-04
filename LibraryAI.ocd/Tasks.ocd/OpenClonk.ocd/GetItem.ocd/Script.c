@@ -12,7 +12,6 @@ public func Execute(proplist controller, object agent)
 {
 	if (GetItem())
 	{
-		Log("Executing GetItem");
 		var item;
 		if (GetType(GetItem()) == C4V_Def)
 		{
@@ -25,15 +24,23 @@ public func Execute(proplist controller, object agent)
 		
 		if (item)
 		{
-			if (item->Contained() == agent)
+			if (item->Contained() == agent) // got it
 			{
 				Log("Agent has the item, do nothing");
 				return;
 			}
-	
-			if (CanAddCommand(agent))
+			else
 			{
-				agent->SetCommand("Get", item);
+				var move_to = item->Contained() ?? item;
+
+				if (ObjectDistance(agent, move_to) < 10)
+				{
+					agent->Collect(item);
+				}
+				else if (agent->~Agent_IsReadyForCommand())
+				{
+					agent->SetCommand("Follow", move_to);
+				}
 			}
 		}
 		else
@@ -70,8 +77,5 @@ public func GetItem()
 
 public func FindItem(object agent, def type)
 {
-	// look in the agent first
-	var found = FindObject(Find_ID(type), Find_Container(agent)) ?? FindObject(Find_ID(type), Find_NoContainer(), agent->Find_Distance(250));
-	
-	return found;
+	return agent->FindContents(type) ?? agent->~Agent_FindItem(type);
 }
