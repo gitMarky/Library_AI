@@ -69,6 +69,12 @@ public func GetAI(object clonk)
 }
 
 
+public func GetControlEffect()
+{
+	return this.FxAI;
+}
+
+
 // Set active state: Enables/Disables timer
 public func SetActive(object clonk, bool active)
 {
