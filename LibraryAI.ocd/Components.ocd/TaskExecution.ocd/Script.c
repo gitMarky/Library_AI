@@ -33,17 +33,20 @@ public func OnDefineAI(proplist controller)
 {
 	_inherited(controller);
 	
-	// add functions to the AI <- should not be necessary
-	controller->GetControlEffect().AddTask = this.AddTask;
-	controller->GetControlEffect().GetParallelTasks = this.GetParallelTasks;
-	controller->GetControlEffect().GetPriorityTasks = this.GetPriorityTasks;
-	controller->GetControlEffect().GetCurrentTask = this.GetCurrentTask;
+	// add functions to the AI
+	controller->GetControlEffect()->AddFunctions(
+	[
+		// public interface
+		this.AddTask,
+		this.GetParallelTasks,
+		this.GetPriorityTasks,
+		this.GetCurrentTask,
+		// internal interface
+		this.SetCurrentTask,
+		this.FindCurrentTask
+	]);
 
-	// internal interface
-	controller->GetControlEffect().SetCurrentTask = this.SetCurrentTask;
-	controller->GetControlEffect().FindCurrentTask = this.FindCurrentTask;
-
-	// add prop->GetAI()es to the AI
+	// add properties to the AI
 	var properties = {
 		Tasks = {
 			Parallel = [], // tasks that can be executed parallel

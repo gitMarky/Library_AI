@@ -3,11 +3,7 @@
 private func CreateTask()
 {
 	var task = inherited();
-	
-	// add additional functions
-	task.SetItem = this.SetItem;
-	task.GetItem = this.GetItem;
-	
+	task->AddFunctions([this.SetItem, this.GetItem]);
 	return task;
 }
 
