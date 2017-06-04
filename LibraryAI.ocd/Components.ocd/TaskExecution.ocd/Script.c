@@ -41,6 +41,8 @@ public func OnDefineAI(proplist controller)
 		this.GetParallelTasks,
 		this.GetPriorityTasks,
 		this.GetCurrentTask,
+		this.GetAgent,
+		this.SetAgent,
 		// internal interface
 		this.SetCurrentTask,
 		this.FindCurrentTask
@@ -52,6 +54,7 @@ public func OnDefineAI(proplist controller)
 			Parallel = [], // tasks that can be executed parallel
 			Priority = [], // tasks that have to be executed by priority
 			Current = nil, // task that has currently has the highest priority
+			Agent = nil,   // definition that controls the behavior
 		},
 	};
 
@@ -98,6 +101,19 @@ public func GetPriorityTasks()
 public func GetCurrentTask()
 {
 	return this.Tasks.Current;
+}
+
+public func GetAgent()
+{
+	return this.Tasks.Agent;
+}
+
+
+public func SetAgent(def agent)
+{
+	AssertNotNil(agent);
+
+	return this.Tasks.Agent = agent;
 }
 
 /* -- Internals -- */

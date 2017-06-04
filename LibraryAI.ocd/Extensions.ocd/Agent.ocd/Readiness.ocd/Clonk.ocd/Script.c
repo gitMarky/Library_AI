@@ -2,17 +2,14 @@
 	Readiness of clonk type NPCs.
  */
 
-
-func AppendTo(def type)
+public func Agent_IsReadyForCommand(object agent)
 {
-	type->AddFunction(this.Agent_IsReadyForCommand);
-}
+	AssertDefinitionContext();
+	AssertNotNil(agent);
 
-public func Agent_IsReadyForCommand()
-{
-	if (GetCommand() && GetCommand() != "Wait") return false;
+	if (agent->GetCommand() && agent->GetCommand() != "Wait") return false;
 	
-	return GetProcedure() == DFA_WALK
-	    || GetProcedure() == DFA_SCALE
-	    || GetProcedure() == DFA_HANGLE;
+	return agent->GetProcedure() == DFA_WALK
+	    || agent->GetProcedure() == DFA_SCALE
+	    || agent->GetProcedure() == DFA_HANGLE;
 }

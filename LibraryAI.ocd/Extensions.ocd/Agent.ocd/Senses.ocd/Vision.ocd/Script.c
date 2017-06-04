@@ -2,13 +2,13 @@
 	Vision for clonk type NPCs.
  */
 
-
-func AppendTo(def type)
+public func Agent_FindItemType(object agent, def type)
 {
-	type->AddFunction(this.Agent_FindItem);
-}
+	var found = _inherited(agent, type);
 
-public func Agent_FindItem(def type)
-{
-	return FindObject(Find_ID(type), Find_NoContainer(), Find_Distance(250));
+	var candidates = agent->FindObjects(Find_ID(type), Find_NoContainer(), Find_Distance(250));
+
+	if (found) PushBack(candidates, found);
+
+	return agent->GetNearestObject(candidates);
 }

@@ -1,0 +1,4 @@
+#include AgentExtension_Inventory_Clonk
+#include AgentExtension_Ready_Clonk
+#include AgentExtension_Senses_RangedVision
+#include AgentExtension_Movement_Clonk
