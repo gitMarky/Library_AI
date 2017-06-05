@@ -35,8 +35,14 @@ public func SetAI(object clonk, id type)
 public func AddAI(object clonk, id type)
 {
 	AssertDefinitionContext(Format("AddAI(%v, %v)", clonk, type));
+	AssertNotNil(clonk);
+	
+	var ai_on_clonk = GetAI(clonk);
+	Log("Calling AddAI; Clonk has AI %v", ai_on_clonk);
 
 	var fx_ai = GetAI(clonk) ?? clonk->CreateEffect(FxAI, 1, 1, type ?? this);
+	
+	Log("Added AddAI; Clonk has AI %v", fx_ai);
 	return fx_ai;
 }
 

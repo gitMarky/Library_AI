@@ -19,15 +19,16 @@ global func OnTaskSuccess(proplist task)
 	CurrentTest().TaskSuccess = true;
 }
 
-global func SetupAgent()
+global func SetupAgent(object bot)
 {
+	bot = bot ?? CurrentTest().Bot;
 	CurrentTest().AddedAI = true;
 
-	var ai = AI_Local->AddAI(CurrentTest().Bot);
+	var ai = AI_Local->AddAI(bot);
 	ai->SetAgent(AI_Agent_Local);
 	ai.OnTaskSuccess = Global.OnTaskSuccess;
 	
-	Log("After creating the AI:");
+	Log("After creating the AI in %v:", bot);
 	Log("- Current task: %v", ai->GetCurrentTask());
 	Log("- Priority task: %v", ai->GetPriorityTasks());
 	Log("- Parallel task: %v", ai->GetParallelTasks());
@@ -37,6 +38,7 @@ global func OnTestFinished()
 {
 	// Default cleanup
 	if (CurrentTest().Bot) CurrentTest().Bot->RemoveObject();
+	if (CurrentTest().Bot2) CurrentTest().Bot2->RemoveObject();
 	if (CurrentTest().Item) CurrentTest().Item->RemoveObject();
 	CurrentTest().AddedAI = false;
 	CurrentTest().TaskSuccess = false;
@@ -178,6 +180,65 @@ global func Test3_Execute()
 }
 
 global func Test3_OnFinished()
+{
+	OnTestFinished();
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+global func Test4_OnStart(int player)
+{
+	Log("-- Test 4: Run a GetItem-Task, with two clonks --");
+
+	CurrentTest().Bot = CreateObject(Clonk, +10, 190, NO_OWNER);
+	CurrentTest().Bot2 = CreateObject(Clonk, LandscapeWidth() - 10, 190, NO_OWNER);
+	CurrentTest().AdditionalObjects = [];
+	PushBack(CurrentTest().AdditionalObjects, CreateObject(Wood, -20 + LandscapeWidth() / 2, 265, NO_OWNER));
+	PushBack(CurrentTest().AdditionalObjects, CreateObject(Metal, +20 + LandscapeWidth() / 2, 265, NO_OWNER));
+	Wait(10); // wait a little afterwards so that the test does not start right away
+	return true;
+}
+
+global func Test4_Execute()
+{
+	if (CurrentTest().AddedAI)
+	{
+		if (CurrentTest().TaskSuccess)
+		{
+			if (CurrentTest().Item->Contained() == CurrentTest().Bot)
+			{
+				return PassTest("The agent collected the specified item");
+			}
+			else
+			{
+				return FailTest("The agent collected another item, instead of the specified item");
+			}
+		}
+		else
+		{
+			return Wait();
+		}
+	}
+	else
+	{
+		SetupAgent(CurrentTest().Bot);
+		SetupAgent(CurrentTest().Bot2);
+
+		var task = Task_GetItem->AddTo(CurrentTest().Bot, 2);
+		Log("%v", task->GetItem());
+		task->SetItem(Metal);
+		Log("%v", task->GetItem());
+
+		var task = Task_GetItem->AddTo(CurrentTest().Bot2, 2);
+		Log("%v", task->GetItem());
+		task->SetItem(Wood);
+		Log("%v", task->GetItem());
+
+		return Wait();
+	}
+}
+
+global func Test4_OnFinished()
 {
 	OnTestFinished();
 }

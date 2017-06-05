@@ -108,6 +108,7 @@ public func GetPriorityTasks()
 
 public func GetCurrentTask()
 {
+	Log("GetCurrentTask called from context: %v, %v", GetType(this), this);
 	return this.Tasks.Current;
 }
 
