@@ -8,7 +8,7 @@ protected func InitializePlayer(int player)
 	GetCrew(player)->MakeInvincible();
 	
 	// Add test control effect.
-	LaunchTest(1);
+	LaunchTest(2);
 	return true;
 }
 
@@ -26,6 +26,11 @@ global func SetupAgent()
 	var ai = AI_Local->AddAI(CurrentTest().Bot);
 	ai->SetAgent(AI_Agent_Local);
 	ai.OnTaskSuccess = Global.OnTaskSuccess;
+	
+	Log("After creating the AI:");
+	Log("- Current task: %v", ai->GetCurrentTask());
+	Log("- Priority task: %v", ai->GetPriorityTasks());
+	Log("- Parallel task: %v", ai->GetParallelTasks());
 }
 
 global func OnTestFinished()
@@ -73,11 +78,8 @@ global func Test1_Execute()
 	}
 	else
 	{
-		CurrentTest().AddedAI = true;
-	
-		var ai = AI_Local->AddAI(CurrentTest().Bot);
-		ai->SetAgent(AI_Agent_Local);
-		ai.OnTaskSuccess = Global.OnTaskSuccess;
+		SetupAgent();
+		
 		Task_GetItem->AddTo(CurrentTest().Bot, 1)->SetItem(Rock);
 		return Wait();
 	}
@@ -115,11 +117,8 @@ global func Test2_Execute()
 	}
 	else
 	{
-		CurrentTest().AddedAI = true;
-	
-		var ai = AI_Local->AddAI(CurrentTest().Bot);
-		ai->SetAgent(AI_Agent_Local);
-		ai.OnTaskSuccess = Global.OnTaskSuccess;
+		SetupAgent();
+		
 		Task_GetItem->AddTo(CurrentTest().Bot, 1)->SetItem(Rock);
 		return Wait();
 	}
@@ -142,7 +141,7 @@ global func Test3_OnStart(int player)
 	CurrentTest().AdditionalObjects = [];
 	PushBack(CurrentTest().AdditionalObjects, CreateObject(Rock, CurrentTest().Bot->GetX() - 20, 265, NO_OWNER));
 	PushBack(CurrentTest().AdditionalObjects, CreateObject(Rock, CurrentTest().Bot->GetX() + 10, 265, NO_OWNER));
-	Wait(10); // wait a little afterwards so that the test does not start right away
+	Wait(50); // wait a little afterwards so that the test does not start right away
 	return true;
 }
 
@@ -154,11 +153,11 @@ global func Test3_Execute()
 		{
 			if (CurrentTest().Item->Contained() == CurrentTest().Bot)
 			{
-				return PassTest();
+				return PassTest("The agent collected the specified item");
 			}
 			else
 			{
-				return FailTest();
+				return FailTest("The agent collected another item, instead of the specified item");
 			}
 		}
 		else
@@ -170,7 +169,10 @@ global func Test3_Execute()
 	{
 		SetupAgent();
 
-		Task_GetItem->AddTo(CurrentTest().Bot, 1)->SetItem(CurrentTest().Item); // set a specific item
+		var task = Task_GetItem->AddTo(CurrentTest().Bot, 1);
+		Log("%v", task->GetItem());
+		task->SetItem(CurrentTest().Item); // set a specific item
+		Log("%v", task->GetItem());
 		return Wait();
 	}
 }

@@ -141,14 +141,24 @@ global func CurrentTest()
 	return GetEffect("IntTestControl", nil);
 }
 
-global func PassTest()
+global func PassTest(string description)
 {
+	if (description)
+	{
+		Log("[Pass] %s", description);
+	}
+
 	CurrentTest().current_result = true;
 	return true;
 }
 
-global func FailTest()
+global func FailTest(string description)
 {
+	if (description)
+	{
+		Log("[Fail] %s", description);
+	}
+
 	CurrentTest().current_result = false;
 	return true;
 }

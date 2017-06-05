@@ -13,6 +13,14 @@ public func Execute(proplist controller, object agent)
 	if (GetItem())
 	{
 		var logic = controller->GetAgent();
+		
+		
+		
+		Log("Controller has tasks: ");
+		for (var task in controller->GetPriorityTasks())
+		{
+			Log("- %v", task);
+		}
 
 		var item;
 		if (GetType(GetItem()) == C4V_Def)
@@ -60,6 +68,8 @@ public func Execute(proplist controller, object agent)
 
 public func SetItem(item)
 {
+	Log("SetItem(%v) called from %v", item, this);
+
 	if (GetType(item) == C4V_Def || GetType(item) == C4V_C4Object)
 	{
 		this.TaskItem = item;
@@ -74,5 +84,7 @@ public func SetItem(item)
 
 public func GetItem()
 {
+	Log("GetItem called from %v", this);
+
 	return this.TaskItem;
 }

@@ -20,12 +20,14 @@ public func Execute(effect controller, int time)
 	var current_task = controller->GetCurrentTask() ?? controller->FindCurrentTask();
 	if (current_task)
 	{
+		Log("Executing task: %v", current_task);
+	
 		var status = current_task->~Execute(controller, controller.Target);
 		
 		if (status == TASK_EXECUTION_SUCCESS)
 		{
 			controller->~OnTaskSuccess(current_task);
-			controller->FinishPriorityTask(current_task);
+			controller->FinishCurrentTask();
 		}
 	}
 
@@ -52,7 +54,8 @@ public func OnDefineAI(proplist controller)
 		// internal interface
 		this.SetCurrentTask,
 		this.FindCurrentTask,
-		this.FinishPriorityTask,
+		this.FinishCurrentTask,
+		this.ResetCurrentTask
 	]);
 
 	// add properties to the AI
@@ -127,12 +130,24 @@ public func SetAgent(def agent)
 private func SetCurrentTask(proplist task)
 {
 	AssertNotNil(task);
+	Log("Calling setcurrenttask from context %v, %v", GetType(this), this);
+	
 	
 	// TODO: At the moment this simply overrides the current task
 	// Should probably have some kind of handshake-mechanism, so
 	// that the old task can perform a cleanup
 
 	this.Tasks.Current = task;
+}
+
+
+private func ResetCurrentTask()
+{
+	// TODO: At the moment this simply overrides the current task
+	// Should probably have some kind of handshake-mechanism, so
+	// that the old task can perform a cleanup
+
+	this.Tasks.Current = nil;
 }
 
 
@@ -172,7 +187,8 @@ private func FindCurrentTask()
 }
 
 
-private func FinishPriorityTask(proplist task)
+private func FinishCurrentTask()
 {
-	RemoveArrayIndex(GetPriorityTasks(), task.PriorityIndex);
+	RemoveArrayIndex(GetPriorityTasks(), GetCurrentTask().PriorityIndex);
+	//ResetCurrentTask(); // TODO: This somehow got carried over from one AI definition to the next - has to be avoided
 }
