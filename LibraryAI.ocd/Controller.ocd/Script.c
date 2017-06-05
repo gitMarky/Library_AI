@@ -42,6 +42,17 @@ public func AddAI(object clonk, id type)
 
 	var fx_ai = GetAI(clonk) ?? clonk->CreateEffect(FxAI, 1, 1, type ?? this);
 	
+	if (fx_ai.ControllerID)
+	{
+		Log("Newly created AI controller already has ID %d", fx_ai.ControllerID);
+	}
+	else
+	{
+		++Debug_AICounter;
+		fx_ai.ControllerID = Debug_AICounter;
+		Log("Created AI controller with ID %d", fx_ai.ControllerID);
+	}
+	
 	Log("Added AddAI; Clonk has AI %v", fx_ai);
 	return fx_ai;
 }
