@@ -6,7 +6,7 @@ public func Agent_FindItemType(object agent, def type)
 {
 	var found = _inherited(agent, type);
 
-	var candidates = agent->FindObjects(Find_ID(type), Find_NoContainer(), Find_Distance(250));
+	var candidates = agent->FindObjects(Find_ID(type), Find_NoContainer(), Find_Distance(850));
 
 	if (found) PushBack(candidates, found);
 

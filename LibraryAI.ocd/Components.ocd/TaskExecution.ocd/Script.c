@@ -72,6 +72,20 @@ public func OnDefineAI(proplist controller)
 }
 
 
+public func OnAddAI(proplist controller)
+{
+	_inherited(controller);
+
+	// Reset the tasks
+	controller.Tasks = {
+			Parallel = [], // tasks that can be executed parallel
+			Priority = [], // tasks that have to be executed by priority
+			Current = nil, // task that has currently has the highest priority
+			Agent = nil,   // definition that controls the behavior
+	};
+}
+
+
 /* -- Public (AI Controller Effect) Interface -- */
 // should not be called from definition context, but only from the AI itself
 

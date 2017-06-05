@@ -205,7 +205,9 @@ global func Test4_Execute()
 	{
 		if (CurrentTest().TaskSuccess)
 		{
-			if (CurrentTest().Item->Contained() == CurrentTest().Bot)
+			var wood = FindObject(Find_ID(Wood))->Contained() == CurrentTest().Bot2;
+			var metal = FindObject(Find_ID(Metal))->Contained() == CurrentTest().Bot;
+			if (wood && metal)
 			{
 				return PassTest("The agent collected the specified item");
 			}
