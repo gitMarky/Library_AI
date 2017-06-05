@@ -27,11 +27,6 @@ global func SetupAgent(object bot)
 	var ai = AI_Local->AddAI(bot);
 	ai->SetAgent(AI_Agent_Local);
 	ai.OnTaskSuccess = Global.OnTaskSuccess;
-	
-	Log("After creating the AI in %v:", bot);
-	Log("- Current task: %v", ai->GetCurrentTask());
-	Log("- Priority task: %v", ai->GetPriorityTasks());
-	Log("- Parallel task: %v", ai->GetParallelTasks());
 }
 
 global func OnTestFinished()
@@ -172,9 +167,7 @@ global func Test3_Execute()
 		SetupAgent();
 
 		var task = Task_GetItem->AddTo(CurrentTest().Bot, 1);
-		Log("%v", task->GetItem());
 		task->SetItem(CurrentTest().Item); // set a specific item
-		Log("%v", task->GetItem());
 		return Wait();
 	}
 }
@@ -226,15 +219,8 @@ global func Test4_Execute()
 		SetupAgent(CurrentTest().Bot);
 		SetupAgent(CurrentTest().Bot2);
 
-		var task = Task_GetItem->AddTo(CurrentTest().Bot, 2);
-		Log("%v", task->GetItem());
-		task->SetItem(Metal);
-		Log("%v", task->GetItem());
-
-		var task = Task_GetItem->AddTo(CurrentTest().Bot2, 2);
-		Log("%v", task->GetItem());
-		task->SetItem(Wood);
-		Log("%v", task->GetItem());
+		Task_GetItem->AddTo(CurrentTest().Bot, 1)->SetItem(Metal);
+		Task_GetItem->AddTo(CurrentTest().Bot2, 1)->SetItem(Wood);
 
 		return Wait();
 	}

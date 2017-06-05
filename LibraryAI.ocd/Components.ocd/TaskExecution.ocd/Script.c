@@ -20,8 +20,6 @@ public func Execute(effect controller, int time)
 	var current_task = controller->GetCurrentTask() ?? controller->FindCurrentTask();
 	if (current_task)
 	{
-		Log("Executing task: %v", current_task);
-	
 		var status = current_task->~Execute(controller, controller.Target);
 		
 		if (status == TASK_EXECUTION_SUCCESS)
@@ -122,7 +120,6 @@ public func GetPriorityTasks()
 
 public func GetCurrentTask()
 {
-	Log("GetCurrentTask called from context: %v, %v", GetType(this), this);
 	return this.Tasks.Current;
 }
 
@@ -145,8 +142,6 @@ public func SetAgent(def agent)
 private func SetCurrentTask(proplist task)
 {
 	AssertNotNil(task);
-	Log("Calling setcurrenttask from context %v, %v", GetType(this), this);
-	
 	
 	// TODO: At the moment this simply overrides the current task
 	// Should probably have some kind of handshake-mechanism, so

@@ -36,24 +36,20 @@ public func AddAI(object clonk, id type)
 {
 	AssertDefinitionContext(Format("AddAI(%v, %v)", clonk, type));
 	AssertNotNil(clonk);
-	
-	var ai_on_clonk = GetAI(clonk);
-	Log("Calling AddAI; Clonk has AI %v", ai_on_clonk);
 
 	var fx_ai = GetAI(clonk) ?? clonk->CreateEffect(FxAI, 1, 1, type ?? this);
-	
+
 	if (fx_ai.ControllerID)
 	{
-		Log("Newly created AI controller already has ID %d", fx_ai.ControllerID);
+		FatalError(Format("Newly created AI controller already has ID %d", fx_ai.ControllerID));
 	}
 	else
 	{
 		++Debug_AICounter;
 		fx_ai.ControllerID = Debug_AICounter;
-		Log("Created AI controller with ID %d", fx_ai.ControllerID);
+		AI_Controller->DebugLogAI("Created AI controller with ID %d", fx_ai.ControllerID);
 	}
-	
-	Log("Added AddAI; Clonk has AI %v", fx_ai);
+
 	return fx_ai;
 }
 
@@ -302,6 +298,17 @@ private func EditorProp_AIType(id type)
 /*-- Properties --*/
 
 local Plane = 300;
+
+
+local DebugLoggingEnabled = false; // Whether or not debug logging is turned on.
+
+
+public func DebugLogAI(string message)
+{
+	if (AI_Controller.DebugLoggingEnabled)
+		DebugLog(message);
+}
+
 
 /*-- Callbacks --*/
 
