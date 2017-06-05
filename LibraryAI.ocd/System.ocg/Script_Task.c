@@ -2,6 +2,14 @@
 	Prototype for task prototypes.
 */
 
+// return values
+
+static const TASK_EXECUTION_FAILURE = -1;
+static const TASK_EXECUTION_IN_PROGRESS = 0;
+static const TASK_EXECUTION_SUCCESS = 1;
+
+// task prototype
+
 static const Task = new Effect 
 {
 	/* -- Interface --*/
@@ -41,7 +49,7 @@ static const Task = new Effect
 		priority = 0,
 		transferrable = false,
 	},
-	
+
 	/* -- Execution -- */
 	
 	Execute = func (proplist controller, object agent)

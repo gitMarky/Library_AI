@@ -28,8 +28,7 @@ public func Execute(proplist controller, object agent)
 		{
 			if (logic->Agent_HasItem(agent, item)) // got it
 			{
-				Log("Agent has the item, do nothing");
-				return;
+				return TASK_EXECUTION_SUCCESS;
 			}
 			else
 			{
@@ -43,16 +42,18 @@ public func Execute(proplist controller, object agent)
 				{
 					logic->Agent_MoveTo(agent, move_to);
 				}
+				
+				return TASK_EXECUTION_IN_PROGRESS;
 			}
 		}
 		else
 		{
-			Log("No item found");
+			return TASK_EXECUTION_FAILURE;
 		}
 	}
 	else
 	{
-		FatalError("Cannot execute task, because there is no item");
+		FatalError("Task definition error: Cannot execute task, because there is no item");
 	}
 }
 

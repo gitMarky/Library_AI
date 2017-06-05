@@ -1,5 +1,5 @@
 
-public func AddTo(object agent)
+public func AddTo(object agent, int priority)
 {
 	AssertDefinitionContext();
 
@@ -7,7 +7,7 @@ public func AddTo(object agent)
 
 	var task = CreateTask();
 
-	controller->AddTask(task);
+	controller->AddTask(task, priority);
 	
 	return task;
 }

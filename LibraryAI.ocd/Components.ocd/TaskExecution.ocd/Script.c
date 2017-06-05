@@ -20,7 +20,13 @@ public func Execute(effect controller, int time)
 	var current_task = controller->GetCurrentTask() ?? controller->FindCurrentTask();
 	if (current_task)
 	{
-		current_task->~Execute(controller, controller.Target);
+		var status = current_task->~Execute(controller, controller.Target);
+		
+		if (status == TASK_EXECUTION_SUCCESS)
+		{
+			controller->~OnTaskSuccess(current_task);
+			controller->FinishPriorityTask(current_task);
+		}
 	}
 
 	return FX_OK;
@@ -45,7 +51,8 @@ public func OnDefineAI(proplist controller)
 		this.SetAgent,
 		// internal interface
 		this.SetCurrentTask,
-		this.FindCurrentTask
+		this.FindCurrentTask,
+		this.FinishPriorityTask,
 	]);
 
 	// add properties to the AI
@@ -65,13 +72,11 @@ public func OnDefineAI(proplist controller)
 /* -- Public (AI Controller Effect) Interface -- */
 // should not be called from definition context, but only from the AI itself
 
-public func AddTask(proplist task)
+public func AddTask(proplist task, int priority)
 {
-	Log("Calling 'AddTask'; Context: %v in %v", GetType(this), this);
-
 	AssertNotNil(task);
 
-	var priority = task->~GetPriority();
+	task->~SetPriority(priority);
 	if (priority > 0)
 	{
 		PushBack(GetPriorityTasks(), task);
@@ -113,7 +118,8 @@ public func SetAgent(def agent)
 {
 	AssertNotNil(agent);
 
-	return this.Tasks.Agent = agent;
+	this.Tasks.Agent = agent;
+	return this;
 }
 
 /* -- Internals -- */
@@ -142,15 +148,20 @@ private func FindCurrentTask()
 		
 		// find
 		var current_task;
-		for (var task in GetPriorityTasks())
+		for (var i = 0; i < GetLength(GetPriorityTasks()); ++i)
 		{
+			// update task index
+			var task = GetPriorityTasks()[i];
+			task.PriorityIndex = i;
+		
+			// potential candidate
 			if (!current_task || current_task->GetPriority() < task->GetPriority())
 			{
 				current_task = task;
 			}
 		}
 		
-		// update
+		// update actual current task
 		if (GetCurrentTask() != current_task)
 		{
 			SetCurrentTask(current_task);
@@ -158,4 +169,10 @@ private func FindCurrentTask()
 
 		return task;
 	}
+}
+
+
+private func FinishPriorityTask(proplist task)
+{
+	RemoveArrayIndex(GetPriorityTasks(), task.PriorityIndex);
 }
