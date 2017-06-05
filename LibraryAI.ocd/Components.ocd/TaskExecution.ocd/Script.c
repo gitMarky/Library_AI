@@ -200,5 +200,5 @@ private func FindCurrentTask()
 private func FinishCurrentTask()
 {
 	RemoveArrayIndex(GetPriorityTasks(), GetCurrentTask().PriorityIndex);
-	//ResetCurrentTask(); // TODO: This somehow got carried over from one AI definition to the next - has to be avoided
+	ResetCurrentTask();
 }

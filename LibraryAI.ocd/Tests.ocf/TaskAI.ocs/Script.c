@@ -196,17 +196,19 @@ global func Test4_Execute()
 {
 	if (CurrentTest().AddedAI)
 	{
-		if (CurrentTest().TaskSuccess)
+		if (CurrentTest().Bot->GetAI()->GetCurrentTask() == nil
+		 && CurrentTest().Bot2->GetAI()->GetCurrentTask() == nil)
 		{
-			var wood = FindObject(Find_ID(Wood))->Contained() == CurrentTest().Bot2;
-			var metal = FindObject(Find_ID(Metal))->Contained() == CurrentTest().Bot;
+			var metal = doTest("Metal should be collected by the first bot. It is contained in %v, expected %v.", FindObject(Find_ID(Metal))->Contained(), CurrentTest().Bot);
+			var wood = doTest("Wood should be collected by the second bot. It is contained in %v, expected %v.", FindObject(Find_ID(Wood))->Contained(), CurrentTest().Bot2);
+		
 			if (wood && metal)
 			{
-				return PassTest("The agent collected the specified item");
+				return PassTest("The agents collected the specified items");
 			}
 			else
 			{
-				return FailTest("The agent collected another item, instead of the specified item");
+				return FailTest("The agents collected another item, instead of the specified item");
 			}
 		}
 		else
