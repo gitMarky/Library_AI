@@ -15,7 +15,7 @@ public func AddTo(object agent, int priority)
 	{
 		++Debug_TaskCounter;
 		task.TaskID = Debug_TaskCounter;
-		AI_Controller->DebugLogAI("Created task with ID %d", task.TaskID);
+		AI_Debugging->LogAI_Info(controller, Format("Created task with ID %d", task.TaskID));
 	}
 
 	controller->AddTask(task, priority);
