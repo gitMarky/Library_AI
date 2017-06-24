@@ -27,6 +27,11 @@ public func Execute(effect controller, int time)
 			controller->~OnTaskSuccess(current_task);
 			controller->FinishCurrentTask();
 		}
+		else if (status == TASK_EXECUTION_FAILURE)
+		{
+			controller->~OnTaskFailure(current_task);
+			controller->FinishCurrentTask();
+		}
 	}
 
 	return FX_OK;
