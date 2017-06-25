@@ -15,13 +15,17 @@ public func Execute(proplist controller, object agent)
 		var logic = controller->GetAgent();
 
 		var item;
-		if (GetType(GetItem()) == C4V_Def)
+		if (GetType(GetItem()) == C4V_C4Object)
 		{
-			item = logic->Agent_FindItemType(agent, GetItem());
+			item = GetItem();
+		}
+		else if (GetType(GetItem()) == C4V_Def)
+		{
+			item = logic->Agent_FindItem(agent, Find_ID(GetItem()));
 		}
 		else
 		{
-			item = GetItem();
+			item = logic->Agent_FindItem(agent, Find_Now(GetItem()));
 		}
 		
 		if (item)
@@ -60,14 +64,32 @@ public func Execute(proplist controller, object agent)
 
 public func SetItem(item)
 {
-	if (GetType(item) == C4V_Def || GetType(item) == C4V_C4Object)
+	if (GetType(item) == C4V_Def || GetType(item) == C4V_C4Object || GetType(item) == C4V_PropList)
 	{
+		this.TaskItem = item;
+		return this;
+	}
+	else if (GetType(item) == C4V_Array)
+	{
+		if (GetLength(item) == 0)
+		{
+			FatalError("The array must not be empty");
+		}
+		for (var content in item)
+		{
+			var type = GetType(content);
+			if (type != C4V_PropList)
+			{
+				FatalError("The parameters in the array need to come from Find_Later");
+			}
+		}
+
 		this.TaskItem = item;
 		return this;
 	}
 	else
 	{
-		FatalError(Format("The parameter needs to be a definition or an object"));
+		FatalError(Format("The parameter needs to be a definition, an object, or a single call/array of calls of Find_Later"));
 	}
 }
 

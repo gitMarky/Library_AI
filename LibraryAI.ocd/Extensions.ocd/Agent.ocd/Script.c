@@ -4,6 +4,8 @@
  
  */
  
+/* -- Callbacks -- */
+ 
 public func Agent_Initialize(object agent)
 {
 	AssertDefinitionContext();
@@ -19,6 +21,12 @@ public func Agent_Initialize(object agent)
 		agent->Agent_Properties().AddFunctions = Global.AddFunctions;
 	}
 }
+
+
+/* -- Public interface -- */
+
+
+/* -- Internals --*/
 
 
 /**

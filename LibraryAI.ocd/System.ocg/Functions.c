@@ -5,32 +5,36 @@
 
 	@author: Marky
  */
- 
-global func AddFunctions(array functions, bool override)
-{
-	for (var function in functions)
-	{
-		if (function)
-		{
-			AddFunction(function, override);
-		}
-	}
-}
 
 
-global func AddFunction(func function, bool override)
+
+
+global func AddFunction(func call, bool override)
 {
-	var name = GetFunctionName(function);
+	var name = GetFunctionName(call);
 
 	if (this[name] && !override)
 	{
 		FatalError(Format("Cannot override function %s", name));
 	}
 	
-	this[name] = function;
+	this[name] = call;
 }
 
-global func GetFunctionName(func function)
+
+global func AddFunctions(array functions, bool override)
 {
-	return RegexReplace(Format("%v", function), "(.+)\\.(.+)", "$2");
+	for (var call in functions)
+	{
+		if (call)
+		{
+			AddFunction(call, override);
+		}
+	}
+}
+
+
+global func GetFunctionName(func call)
+{
+	return RegexReplace(Format("%v", call), "(.+)\\.(.+)", "$2");
 }
