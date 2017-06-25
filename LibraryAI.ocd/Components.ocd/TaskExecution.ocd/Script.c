@@ -139,6 +139,8 @@ public func SetAgent(def agent)
 	AssertNotNil(agent);
 
 	this.Tasks.Agent = agent;
+	// possibly leaves old agent properties if the agent changes
+	agent->~Agent_Initialize(this.Target);
 	return this;
 }
 

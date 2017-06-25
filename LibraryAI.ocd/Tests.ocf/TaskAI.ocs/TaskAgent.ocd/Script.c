@@ -1,3 +1,4 @@
+#include Agent_BaseFunctionality
 #include AgentExtension_Inventory_Clonk
 #include AgentExtension_Ready_Clonk
 #include AgentExtension_Senses_RangedVision
