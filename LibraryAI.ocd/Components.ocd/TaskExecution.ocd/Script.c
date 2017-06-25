@@ -8,6 +8,11 @@
 
 public func Execute(effect controller, int time)
 {
+	if (this->~QueryCallExecute(controller, controller.Target, time))
+	{
+		return FX_OK;
+	}
+
 	// handle all parallel tasks
 
 	for (var task in controller->GetParallelTasks())
