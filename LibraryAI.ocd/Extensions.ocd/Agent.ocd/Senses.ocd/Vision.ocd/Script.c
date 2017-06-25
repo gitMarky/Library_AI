@@ -15,7 +15,7 @@ public func Agent_Initialize(object agent)
 public func Agent_FindItemType(object agent, def type)
 {
 	var found = _inherited(agent, type);
-	var range = agent->Agent_Properties()->GetVisionRange() ?? 1;
+	var range = agent->Agent_Properties()->GetVisionRange();
 	var candidates = agent->FindObjects(Find_ID(type), Find_NoContainer(), Find_Distance(range));
 
 	if (found) PushBack(candidates, found);
@@ -33,5 +33,5 @@ private func SetVisionRange(int range)
 
 private func GetVisionRange()
 {
-	return this.agent_vision_range;
+	return this.agent_vision_range ?? 1;
 }
