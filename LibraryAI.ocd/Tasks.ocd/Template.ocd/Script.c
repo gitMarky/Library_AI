@@ -6,6 +6,7 @@ public func AddTo(object agent, int priority)
 	var controller = AssertHasAI(agent);
 
 	var task = CreateTask();
+	task->SetTaskType(this);
 
 	if (task.TaskID)
 	{
@@ -27,6 +28,6 @@ private func CreateTask()
 {
 	return new Task
 	{
-			Execute = this.Execute,
+		Execute = this.Execute,
 	};
 }

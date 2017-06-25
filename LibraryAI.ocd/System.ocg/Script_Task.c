@@ -46,8 +46,19 @@ static const Task = new Effect
 	/* -- Internals -- */
 
 	task_data = {
+		type = nil,
 		priority = 0,
 		transferrable = false,
+	},
+	
+	GetTaskType = func ()
+	{
+		return this.task_data.type;
+	},
+	
+	SetTaskType = func (id type)
+	{
+		this.task_data.type = type;
 	},
 
 	/* -- Execution -- */

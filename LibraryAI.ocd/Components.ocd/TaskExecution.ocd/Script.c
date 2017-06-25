@@ -57,6 +57,8 @@ public func OnDefineAI(proplist controller)
 		this.GetParallelTasks,
 		this.GetPriorityTasks,
 		this.GetCurrentTask,
+		this.HasParallelTask,
+		this.HasPriorityTask,
 		this.GetAgent,
 		this.SetAgent,
 		// internal interface
@@ -123,9 +125,33 @@ public func GetParallelTasks()
 	return this.Tasks.Parallel;
 }
 
+public func HasParallelTask(id type)
+{
+	for (var task in this->GetParallelTasks())
+	{
+		if (type == task->GetTaskType())
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 public func GetPriorityTasks()
 {
 	return this.Tasks.Priority;
+}
+
+public func HasPriorityTask(id type)
+{
+	for (var task in this->GetPriorityTasks())
+	{
+		if (type == task->GetTaskType())
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 public func GetCurrentTask()
