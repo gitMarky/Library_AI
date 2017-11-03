@@ -42,6 +42,53 @@ public func FindPath(start, goal)
 }
 
 
+/**
+ Adds a path to another waypoint.
+ 
+ @par target the other waypoint.
+ @par reconnect if this is set to {@code true} then the other waypoint
+                will have a connection to this path, too. Otherwise,
+                the path is one-way only.
+ */
+public func AddPath(object target, bool reconnect)
+{
+	AssertNotNil(target);
+
+	if (GetPath(target))
+	{
+		FatalError(Format("This waypoint already has a path to %v", target));
+	}
+
+	paths[GetKey(target)] = new Map_Waypoint_Path
+	{
+		target = target,
+	};
+
+	if (reconnect)
+	{
+		target->AddPath(this, false);
+	}
+}
+
+
+/**
+ Removes the path to a target.
+ 
+ @par target the other waypoint.
+ @return bool {@code true} if the path was removed.
+              Otherwise, there was no path anyway. 
+ */
+public func RemovePath(object target)
+{
+	if (GetPath(target))
+	{
+		paths[GetKey(target)] = nil;
+		return true;
+	}
+	return false;
+}
+
+
 /* -- Waypoint network interface -- */
 
 private func GetNeighbors()
@@ -72,7 +119,7 @@ private func EstimateDistanceToWaypoint(object node)
 private func GetDistanceToWaypoint(object node)
 {
 	var path = GetPath(node);
-	
+
 	if (nil == path)
 	{
 		FatalError("This function works only for nodes that this waypoint is connected to.");
@@ -106,12 +153,12 @@ static const Map_Waypoint_Path = new Global
 {
 	target = nil,
 	cost = nil,
-	
+
 	GetTarget = func ()
 	{
 		return this.target;
 	},
-	
+
 	GetCost = func ()
 	{
 		return this.cost;
