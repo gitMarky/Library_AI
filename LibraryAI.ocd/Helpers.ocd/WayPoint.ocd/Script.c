@@ -27,6 +27,20 @@ private func Construction()
 
 /* -- Public interface -- */
 
+/**
+ Finds a path from one waypoint to another
+ 
+ @par start the starting waypoint
+ @par goal the destination waypoint
+ 
+ @return array the path to the goal waypoint, as an array,
+               or {@code nil} if no path was found.
+ */
+public func FindPath(start, goal)
+{
+	return AStarWaypointMap->FindPath(start, goal);
+}
+
 
 /* -- Waypoint network interface -- */
 
@@ -104,3 +118,25 @@ static const Map_WayPoint_Path = new Global
 	},
 };
 
+
+// Search algorithm
+local AStarWaypointMap = new AStar
+{
+	// This function is used as a heuristic for estimating the distance: node to the goal
+	distance = func(object node, object goal)
+	{
+		return node->EstimateDistanceToWaypoint(goal);
+	},
+
+	// Cost between two neighboring nodes. 
+	cost = func(object origin, object neighbor)
+	{
+		return origin->GetDistanceToWaypoint(neighbor);
+	},
+
+	// Returns all neighboring nodes.
+	successors = func(object node)
+	{
+		return node->GetNeighbors();
+	},
+};
