@@ -63,6 +63,8 @@ public func AddPath(object target, bool reconnect)
 	{
 		target = target,
 	};
+	
+	Map_PathVisualization->Create(this, target); //, flag, jetpdelay, path_id, dir);
 
 	if (reconnect)
 	{
