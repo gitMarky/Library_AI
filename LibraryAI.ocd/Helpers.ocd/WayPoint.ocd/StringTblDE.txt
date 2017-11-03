@@ -1,0 +1,3 @@
+Name=Wegpunkt
+Description=Orientierungspunkt für die Karte.
+

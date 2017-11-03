@@ -1,0 +1,2 @@
+Name=Waypoint
+Description=Landmark for the map
