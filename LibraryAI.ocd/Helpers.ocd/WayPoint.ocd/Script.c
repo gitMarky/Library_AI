@@ -15,6 +15,7 @@ local Visibility = VIS_Editor;
 
 local paths;
 
+public func IsWaypoint(){ return true; }
 
 /* -- Engine callbacks -- */
 
@@ -28,7 +29,12 @@ private func Construction()
 /* -- Public interface -- */
 
 /**
- Finds a path from one waypoint to another
+ Finds a path from one waypoint to another.
+ Supports the following formats:
+ - FindPath(object, object): Finds a path from an object or a waypoint to another object or waypoint
+ - FindPath({x, y}, {x, y}): Finds a path from a proplist position to another proplist position
+ - FindPath(x1, y1, x2, y2): Finds a path from start coordinates to end coordinates
+ 
  
  @par start the starting waypoint
  @par goal the destination waypoint
@@ -38,7 +44,16 @@ private func Construction()
  */
 public func FindPath(start, goal)
 {
-	return AStarWaypointMap->FindPath(start, goal);
+	AssertNotNil(start);
+	AssertNotNil(goal);
+
+	// all integer parameters: start_x, start_y, end_x, end_y
+	if (Par(2) && Par(3))
+	{
+		return FindPath({x = start, y = goal}, {x = Par(2), y = Par(3)});
+	}
+
+	return AStarWaypointMap->FindPath(FindWaypoint(start), FindWaypoint(goal));
 }
 
 
@@ -146,6 +161,44 @@ private func GetKey(object node)
 private func GetPath(object node)
 {
 	return paths[GetKey(node)];
+}
+
+
+private func FindWaypoint(a, b)
+{
+	if (GetType(a) == C4V_C4Object) // object as first parameter
+	{
+		if (a->~IsWaypoint()) // waypoint? return it
+		{
+			return a;
+		}
+		else
+		{
+			return FindWaypoint(a->GetX(), a->GetY());
+		}
+	}
+	else if (GetType(a) == C4V_PropList) // intepret a proplist
+	{
+		return FindWaypoint(a.x, a.y);
+	}
+	else if (GetType(a) == C4V_Int && GetType(b) == C4V_Int) // interpret integers as a = x, b = y
+	{
+		var waypoints = FindObjects(Find_Func("IsWaypoint"), Sort_Distance(a, b));
+		
+		for (var waypoint in waypoints)
+		{
+			if (PathFree(a, b, waypoint->GetX(), waypoint->GetY()))
+			{
+				return waypoint;
+			}
+		}
+	
+		return nil;
+	}
+	else
+	{
+		FatalError(Format("Unsupported parameters: a = %v, b = %v; Supported: FindWaypoint(object), FindWaypoint({x, y}), FindWaypoint(int, int)", a, b));
+	}
 }
 
 /* -- Internals - additional structures -- */
