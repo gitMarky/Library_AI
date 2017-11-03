@@ -102,7 +102,7 @@ private func GetPath(object node)
 /* -- Internals - additional structures -- */
 
 // Description for a path
-static const Map_WayPoint_Path = new Global
+static const Map_Waypoint_Path = new Global
 {
 	target = nil,
 	cost = nil,

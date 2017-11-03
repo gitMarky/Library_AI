@@ -1,5 +1,5 @@
 [DefCore]
-id=Map_WayPoint
+id=Map_Waypoint
 Version=8,0
 Category=C4D_StaticBack
 Width=16
