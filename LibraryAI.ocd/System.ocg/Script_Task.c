@@ -24,6 +24,16 @@ static const Task = new Effect
 		return this.task_data.priority;
 	},
 	
+	SetDescription = func (int description)
+	{
+		this.task_data.description = description;
+	},
+	
+	GetDescription = func ()
+	{
+		return this.task_data.description;
+	},
+	
 	IsTransferrable = func ()
 	{
 		return this.task_data.transferrable;
@@ -49,6 +59,7 @@ static const Task = new Effect
 		type = nil,
 		priority = 0,
 		transferrable = false,
+		description = "unknown",
 	},
 	
 	GetTaskType = func ()
