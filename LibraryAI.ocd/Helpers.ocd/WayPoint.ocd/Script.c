@@ -174,7 +174,7 @@ private func FindWaypoint(a, b)
 		}
 		else
 		{
-			return FindWaypoint(a->GetX(), a->GetY());
+			return FindWaypoint(a->GetX(), a->GetY()) ?? a; // TODO: Test fallback option
 		}
 	}
 	else if (GetType(a) == C4V_PropList) // intepret a proplist
