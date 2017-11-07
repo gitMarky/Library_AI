@@ -73,39 +73,25 @@ public func FindPath(start, goal)
 		}
 		var neighbors = AStarWaypointMap->neighbor_waypoints(x, y);
 		
-		// Look up all (up to three) paths
-		var path_candidates = [];
+		// Look up all (up to three) paths and choose the best one
 		var min_cost = nil;
-		var min_index = nil;
-		
+		var min_path = nil;
 		for (var wp in neighbors)
 		{
 			var path = AStarWaypointMap->FindPath(start, wp);
-
-			if (path) // Get minimal path
+			if (path)
 			{
-				PushBack(path_candidates, path);
 				var path_cost = AStarWaypointMap->total_cost(path);
-				
 				if (!min_cost || path_cost < min_cost)
 				{
-					min_index = GetLength(path_candidates) - 1;
 					min_cost = path_cost;
+					min_path = path;
 				}
 			}
 		}
 		
-		// Choose the best path
-		if (min_cost)
-		{
-			var path = path_candidates[min_index];
-			PushBack(path, goal);
-			return path;
-		}
-		else
-		{
-			return nil;
-		}
+		if (min_path) PushBack(min_path, goal);
+		return min_path;
 	}
 }
 
