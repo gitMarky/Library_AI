@@ -52,8 +52,61 @@ public func FindPath(start, goal)
 	{
 		return FindPath({x = start, y = goal}, {x = Par(2), y = Par(3)});
 	}
+	
+	if (goal->~IsWaypoint())
+	{
+		return AStarWaypointMap->FindPath(start, goal);
+	}
+	else
+	{
+		// Find nearest waypoints at the goal
+		var x, y;
+		if (GetType(goal) == C4V_C4Object)
+		{
+			x = goal->GetX();
+			y = goal->GetY();
+		}
+		else
+		{
+			x = goal.x;
+			y = goal.y;
+		}
+		var neighbors = AStarWaypointMap->neighbor_waypoints(x, y);
+		
+		// Look up all (up to three) paths
+		var path_candidates = [];
+		var min_cost = nil;
+		var min_index = nil;
+		
+		for (var wp in neighbors)
+		{
+			var path = AStarWaypointMap->FindPath(start, wp);
 
-	return AStarWaypointMap->FindPath(start, goal);
+			if (path) // Get minimal path
+			{
+				PushBack(path_candidates, path);
+				var path_cost = AStarWaypointMap->total_cost(path);
+				
+				if (!min_cost || path_cost < min_cost)
+				{
+					min_index = GetLength(path_candidates) - 1;
+					min_cost = path_cost;
+				}
+			}
+		}
+		
+		// Choose the best path
+		if (min_cost)
+		{
+			var path = path_candidates[min_index];
+			PushBack(path, goal);
+			return path;
+		}
+		else
+		{
+			return nil;
+		}
+	}
 }
 
 
@@ -270,4 +323,15 @@ local AStarWaypointMap = new AStar
 	{
 		return Format("x%d_y%d", x / 10, y / 10);
 	},
+
+
+	total_cost = func (array path)
+	{
+		var value = 0;
+		for (var index = 0; index < GetLength(path) - 1; ++index)
+		{
+			value += cost(path[index], path[index + 1]);
+		}
+		return value;
+	}
 };

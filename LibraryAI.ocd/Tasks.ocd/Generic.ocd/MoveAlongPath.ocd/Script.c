@@ -16,7 +16,7 @@ public func Execute(proplist controller, object agent)
 	}
 	else
 	{
-		this.PathInfo = this.PathInfo ?? Map_Waypoint->FindPath(this.PathStart, this.PathDestination);
+		FindPath();
 	}
 
 	if (this.PathInfo)
@@ -78,6 +78,10 @@ public func SetStart(object start)
 {
 	this.PathStart = start;
 	ResetPath();
+	if (this.PathDestination)
+	{
+		FindPath();
+	}
 	return this;
 }
 
@@ -86,12 +90,23 @@ public func SetDestination(object destination)
 {
 	this.PathDestination = destination;
 	ResetPath();
+	if (this.PathStart)
+	{
+		FindPath();
+	}
 	return this;
 }
+
 
 private func ResetPath()
 {
 	this.PathProgress = 0;
 	this.PathInfo = nil;
 	this.PathTimeout = nil;
+}
+
+
+private func FindPath()
+{
+	this.PathInfo = this.PathInfo ?? Map_Waypoint->FindPath(this.PathStart, this.PathDestination);
 }
