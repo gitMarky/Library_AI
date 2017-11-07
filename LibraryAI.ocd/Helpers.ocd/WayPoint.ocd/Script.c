@@ -53,7 +53,7 @@ public func FindPath(start, goal)
 		return FindPath({x = start, y = goal}, {x = Par(2), y = Par(3)});
 	}
 
-	return AStarWaypointMap->FindPath(FindWaypoint(start), FindWaypoint(goal));
+	return AStarWaypointMap->FindPath(start, goal); //FindWaypoint(start), FindWaypoint(goal));
 }
 
 
@@ -221,24 +221,99 @@ static const Map_Waypoint_Path = new Global
 };
 
 
+// Proplist that saves neighboring waypoints for arbitrary points on the landscape, in a 10pixel grid
+static Map_Waypoint_PathCache;
+
+
 // Search algorithm
 local AStarWaypointMap = new AStar
 {
 	// This function is used as a heuristic for estimating the distance: node to the goal
 	distance = func(object node, object goal)
 	{
-		return node->EstimateDistanceToWaypoint(goal);
+		if (node->~IsWaypoint())
+		{
+			return node->EstimateDistanceToWaypoint(goal);
+		}
+		else
+		{
+			return ObjectDistance(node, goal);
+		}
 	},
 
 	// Cost between two neighboring nodes. 
 	cost = func(object origin, object neighbor)
 	{
-		return origin->GetDistanceToWaypoint(neighbor);
+		if (origin->~IsWaypoint())
+		{
+			return origin->GetDistanceToWaypoint(neighbor);
+		}
+		else
+		{
+			return ObjectDistance(origin, neighbor);
+		}
 	},
 
 	// Returns all neighboring nodes.
 	successors = func(object node)
 	{
-		return node->GetNeighbors();
+		if (node->~IsWaypoint())
+		{
+			return node->GetNeighbors();
+		}
+		else
+		{
+			return neighbor_waypoints(node->GetX(), node->GetY());
+		}
+	},
+	
+	// Proplist that saves neighboring waypoints for arbitrary points on the landscape, in a 10pixel grid
+	// neighbor_cache = { can_write = false, },
+	
+	// Gets up to 3 waypoints in the vincinity of a point, on a 10pixel grid
+	neighbor_waypoints = func(int x, int y)
+	{
+		/*if (!this.neighbor_cache.can_write)
+		{
+			this.neighbor_cache = MakePropertyWritable("neighbor_cache", this);
+			this.neighbor_cache.can_write = true;
+		}*/
+		if (!Map_Waypoint_PathCache)
+		{
+			Map_Waypoint_PathCache = {};
+		}
+	
+		var key = neighbor_key(x,y);
+		var cached = Map_Waypoint_PathCache[key]; //neighbor_cache[key];
+		if (cached)
+		{
+			return cached;
+		}
+		else
+		{
+			var waypoints = FindObjects(Find_Func("IsWaypoint"), Sort_Distance(x, y));
+			var neighbors = [];
+
+			for (var waypoint in waypoints)
+			{
+				if (PathFree(x, y, waypoint->GetX(), waypoint->GetY()))
+				{
+					PushBack(neighbors, waypoint);
+				}
+				if (GetLength(neighbors) >= 3)
+				{
+					break;
+				}
+			}
+			
+			//neighbor_cache[key] = neighbors;
+			Map_Waypoint_PathCache[key] = neighbors;
+			return neighbors;
+		}
+	},
+	
+	neighbor_key = func (int x, int y)
+	{
+		return Format("x%d_y%d", x / 10, y / 10);
 	},
 };
