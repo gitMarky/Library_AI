@@ -29,11 +29,13 @@ public func Execute(effect controller, int time)
 		
 		if (status == TASK_EXECUTION_SUCCESS)
 		{
+			current_task->~OnTaskSuccess(controller, controller.Target);
 			controller->~OnTaskSuccess(current_task);
 			controller->FinishCurrentTask();
 		}
 		else if (status == TASK_EXECUTION_FAILURE)
 		{
+			current_task->~OnTaskFailure(controller, controller.Target);
 			controller->~OnTaskFailure(current_task);
 			controller->FinishCurrentTask();
 		}
