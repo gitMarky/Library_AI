@@ -53,7 +53,7 @@ public func FindPath(start, goal)
 		return FindPath({x = start, y = goal}, {x = Par(2), y = Par(3)});
 	}
 
-	return AStarWaypointMap->FindPath(start, goal); //FindWaypoint(start), FindWaypoint(goal));
+	return AStarWaypointMap->FindPath(start, goal);
 }
 
 
@@ -164,43 +164,6 @@ private func GetPath(object node)
 }
 
 
-private func FindWaypoint(a, b)
-{
-	if (GetType(a) == C4V_C4Object) // object as first parameter
-	{
-		if (a->~IsWaypoint()) // waypoint? return it
-		{
-			return a;
-		}
-		else
-		{
-			return FindWaypoint(a->GetX(), a->GetY()) ?? a; // TODO: Test fallback option
-		}
-	}
-	else if (GetType(a) == C4V_PropList) // intepret a proplist
-	{
-		return FindWaypoint(a.x, a.y);
-	}
-	else if (GetType(a) == C4V_Int && GetType(b) == C4V_Int) // interpret integers as a = x, b = y
-	{
-		var waypoints = FindObjects(Find_Func("IsWaypoint"), Sort_Distance(a, b));
-		
-		for (var waypoint in waypoints)
-		{
-			if (PathFree(a, b, waypoint->GetX(), waypoint->GetY()))
-			{
-				return waypoint;
-			}
-		}
-	
-		return nil;
-	}
-	else
-	{
-		FatalError(Format("Unsupported parameters: a = %v, b = %v; Supported: FindWaypoint(object), FindWaypoint({x, y}), FindWaypoint(int, int)", a, b));
-	}
-}
-
 /* -- Internals - additional structures -- */
 
 // Description for a path
@@ -267,24 +230,16 @@ local AStarWaypointMap = new AStar
 		}
 	},
 	
-	// Proplist that saves neighboring waypoints for arbitrary points on the landscape, in a 10pixel grid
-	// neighbor_cache = { can_write = false, },
-	
 	// Gets up to 3 waypoints in the vincinity of a point, on a 10pixel grid
 	neighbor_waypoints = func(int x, int y)
 	{
-		/*if (!this.neighbor_cache.can_write)
-		{
-			this.neighbor_cache = MakePropertyWritable("neighbor_cache", this);
-			this.neighbor_cache.can_write = true;
-		}*/
 		if (!Map_Waypoint_PathCache)
 		{
 			Map_Waypoint_PathCache = {};
 		}
 	
 		var key = neighbor_key(x,y);
-		var cached = Map_Waypoint_PathCache[key]; //neighbor_cache[key];
+		var cached = Map_Waypoint_PathCache[key];
 		if (cached)
 		{
 			return cached;
@@ -305,8 +260,7 @@ local AStarWaypointMap = new AStar
 					break;
 				}
 			}
-			
-			//neighbor_cache[key] = neighbors;
+
 			Map_Waypoint_PathCache[key] = neighbors;
 			return neighbors;
 		}
