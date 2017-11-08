@@ -57,7 +57,7 @@ static const Task = new Effect
 	 */
 	SetParentTask = func(proplist parent)
 	{
-		this.task_data.parent_task = parent;
+		this.task_parent = parent;
 	},
 
 	/**
@@ -66,7 +66,7 @@ static const Task = new Effect
 	 */
 	GetParentTask = func()
 	{
-		return this.task_data.parent_task;
+		return this.task_parent; // relies on proplists being passed as a reference, cannot be saved in task_data or else all tasks have the same parent
 	},
 	
 	/**
@@ -119,7 +119,6 @@ static const Task = new Effect
 
 	task_data = {
 		type = nil,
-		parent_task = nil, // relies on proplists being passed as a reference
 		priority = 0,
 		transferrable = false,
 		description = "unknown",

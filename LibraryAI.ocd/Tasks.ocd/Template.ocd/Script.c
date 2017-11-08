@@ -18,13 +18,13 @@ public func AddTo(object agent, int priority, proplist parent)
 		task->SetTaskID(Debug_TaskCounter);
 		AI_Debugging->LogAI_Info(controller, Format("Created task with ID %d", task->GetTaskID()));
 	}
-
-	controller->AddTask(task, priority);
 	
 	if (parent)
 	{
 		task->SetParentTask(parent);
 	}
+
+	controller->AddTask(task, priority);
 
 	return task;
 }

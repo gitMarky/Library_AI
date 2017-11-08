@@ -164,7 +164,7 @@ public func AddTask(proplist task, int priority)
 		PushBack(GetPriorityTasks(), task);
 
 		// update the current task
-		if (GetCurrentTask() && GetCurrentTask()->~GetPriority() < priority)
+		if (GetCurrentTask() && GetCurrentTask()->~GetPriority() < task->~GetPriority()) // must call the getter, in order to get the correct priority from parent tasks
 		{
 			SetCurrentTask(task);
 		}
