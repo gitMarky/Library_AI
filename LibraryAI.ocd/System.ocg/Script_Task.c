@@ -1,5 +1,8 @@
 /**
-	Prototype for task prototypes.
+	Definition for tasks.
+	
+	@author Marky
+	@version 0.1.0
 */
 
 // return values
@@ -19,9 +22,23 @@ static const Task = new Effect
 		this.task_data.priority = priority;
 	},
 	
+	
+	/**
+	 Gets the priority of the task.
+	 
+	 @return int The priority, and if the task has
+	         a parent task, the parent priority
+	         is added to the value.
+	 @version 0.2.0
+	 */
 	GetPriority = func ()
 	{
-		return this.task_data.priority;
+		var from_parent = 0;
+		if (GetParentTask())
+		{
+			from_parent = GetParentTask()->GetPriority();
+		}
+		return this.task_data.priority + from_parent;
 	},
 	
 	SetDescription = func (int description)
@@ -32,6 +49,51 @@ static const Task = new Effect
 	GetDescription = func ()
 	{
 		return this.task_data.description;
+	},
+
+	/**
+	 Sets the parent task. The parent task is a reference to the actual parent task.
+	 @version 0.2.0
+	 */
+	SetParentTask = func(proplist parent)
+	{
+		this.task_data.parent_task = parent;
+	},
+
+	/**
+	 Gets the parent task. The parent task is a reference to the original parent task.
+	 @version 0.2.0
+	 */
+	GetParentTask = func()
+	{
+		return this.task_data.parent_task;
+	},
+	
+	/**
+	 Sets the task ID. This can be done only once.
+	 @par ID The task ID.
+	 @version 0.2.0
+	 */
+	SetTaskID = func(int ID)
+	{
+		if (GetTaskID())
+		{
+			FatalError(Format("Task already has ID %d, cannot assign new ID %d", GetTaskID(), ID));
+		}
+		else
+		{
+			this.task_id = ID;
+		}
+	},
+	
+	
+	/**
+	 Gets a unique numeric identifier for the task, if it was assigned.
+	 @version 0.2.0
+	 */
+	GetTaskID = func()
+	{
+		return this.task_id;
 	},
 	
 	IsTransferrable = func ()
@@ -57,6 +119,7 @@ static const Task = new Effect
 
 	task_data = {
 		type = nil,
+		parent_task = nil, // relies on proplists being passed as a reference
 		priority = 0,
 		transferrable = false,
 		description = "unknown",

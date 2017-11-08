@@ -255,6 +255,23 @@ public func GetCurrentTask()
 
 
 /**
+ Gets a task with a specific ID. Each task ID is unique.
+ 
+ @par nr The task ID.
+ @return proplist The task, or {@code nil} if this controller
+         has no such task.
+
+ @version 0.2.0
+ */
+public func GetTaskByID(int nr)
+{
+	for (var task in GetPriorityTasks())
+	{
+	}
+}
+
+
+/**
  Gets the definition that defines the logic and capabilities
  of how tasks are executed.
 

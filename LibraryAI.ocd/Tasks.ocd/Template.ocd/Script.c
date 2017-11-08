@@ -1,5 +1,5 @@
 
-public func AddTo(object agent, int priority)
+public func AddTo(object agent, int priority, proplist parent)
 {
 	AssertDefinitionContext();
 
@@ -8,18 +8,23 @@ public func AddTo(object agent, int priority)
 	var task = CreateTask();
 	task->SetTaskType(this);
 
-	if (task.TaskID)
+	if (task->GetTaskID())
 	{
-		FatalError(Format("Newly created task already has ID %d", task.TaskID));
+		FatalError(Format("Newly created task already has ID %d", task->GetTaskID()));
 	}
 	else
 	{
 		++Debug_TaskCounter;
-		task.TaskID = Debug_TaskCounter;
-		AI_Debugging->LogAI_Info(controller, Format("Created task with ID %d", task.TaskID));
+		task->SetTaskID(Debug_TaskCounter);
+		AI_Debugging->LogAI_Info(controller, Format("Created task with ID %d", task->GetTaskID()));
 	}
 
 	controller->AddTask(task, priority);
+	
+	if (parent)
+	{
+		task->SetParentTask(parent);
+	}
 
 	return task;
 }
