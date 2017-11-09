@@ -3,7 +3,7 @@
 private func CreateTask()
 {
 	var task = inherited();
-	task->AddFunctions([this.SetTarget, this.GetTarget]);
+	task->AddFunctions([this.SetTarget, this.GetTarget, this.SucceedOnArrival]);
 	return task;
 }
 
@@ -38,7 +38,11 @@ public func Execute(proplist controller, object agent)
 				{
 					this.TaskMove = nil;
 				}
-				return TASK_EXECUTION_SUCCESS;
+				
+				if (this.TaskSuccessOnArrival)
+				{
+					return TASK_EXECUTION_SUCCESS;
+				}
 			}
 			else
 			{
@@ -63,6 +67,12 @@ public func Execute(proplist controller, object agent)
 	{
 		FatalError("Task definition error: Cannot execute task, because there is no target");
 	}
+}
+
+
+public func SucceedOnArrival()
+{
+	this.TaskSuccessOnArrival = true;
 }
 
 
