@@ -7,7 +7,14 @@
 		{@code Task_GetItem->AddTo(clonk, priority)->SetTarget(Metal)}
 		Makes {@code clonk} collect a {@code Metal} object.
 	}
-
+	
+	Requires the following functions to be implemented in the agent logic:
+	- {@code Agent_FindItem(agent, GetItem())}
+	- {@code Agent_HasItem(agent, item)}
+    - {@code Agent_IsNear(agent, item)}
+    - {@code Agent_TakeItem(agent, item)}
+    - {@code Agent_MoveTo(agent, item)}
+    
 	@author Marky
 	@version 0.2.0
 */
@@ -24,12 +31,12 @@ private func CreateTask()
 
 /**
  <ol>
- <li>Finds an item, as defined by {@link Task_GetItem#SetItem}, with {@code Agent_FindItem(agent, GetItem())}.</li>
- <li>Succeeds, if {@code Agent_HasItem(agent, item)}.</li>
+ <li>Finds an item, as defined by {@link Task_GetItem#SetItem}.</li>
+ <li>Succeeds if the agent has such an item</li>
  <li>Otherwise,
      <ul>
-     <li>if {@code Agent_IsNear(agent, item)} then {@code Agent_TakeItem(agent, item)}</li>
-     <li>else {@code Agent_MoveTo(agent, item)} where item is the item or its container</li>
+     <li>if the agent is near the item it collects the item</li>
+     <li>else the agent moves to the item</li>
      </ul>
  </li>
  </ol>
