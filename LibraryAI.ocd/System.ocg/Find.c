@@ -1,3 +1,10 @@
+/**
+	Find functions
+
+	@author Marky
+	@version 0.2.0
+ */
+
 
 /**
  Defines a Find_* function to be called later. The functions can be called with Find_Now().
@@ -8,6 +15,8 @@
  @par call This Find_* function that will be called.
            Should be a function pointer to one of the Global.Find_* functions.
            Up to 9 additional parameters for the function call are possible.
+ @return proplist A proplist that can be used in {@link Global#Find_Now}.
+ @version 0.2.0
  */
 global func Find_Later(func call)
 {
@@ -36,12 +45,15 @@ global func Find_Later(func call)
 
 
 /**
- Evaluates a Find_Later() function.
+ Evaluates a {@link Global#Find_Later} function.
  
  @par find_criteria Can either be criteria defined by Find_Later or
                     an array of criteria defined by Find_Later.
                     In case of an array, the criteria will be
                     joined by Find_And().
+ @return array An array of objects that can be used in {@link Global#FindObject} and
+               similar functions.
+ @version 0.2.0
  */
 global func Find_Now(find_criteria)
 {

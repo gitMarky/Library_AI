@@ -1,10 +1,17 @@
 /*
 	Assert.c
 
-	@author: Marky
+	@author Marky
+	@version 0.2.0
  */
 
 
+/**
+ Throws a fatal error if the object has no AI.
+ 
+ @par agent The object that is being controlled by the AI.
+ @par description [optional] A description for the error.
+*/
 global func AssertHasAI(object agent, string description)
 {
 	AssertDefinitionContext(description);
