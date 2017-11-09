@@ -1,4 +1,18 @@
+/**
+	Get item
+
+	This task makes the agent collect an item, see {@link Task_GetItem#Execute}.
+
+	{@example
+		{@code Task_GetItem->AddTo(clonk, priority)->SetTarget(Metal)}
+		Makes {@code clonk} collect a {@code Metal} object.
+	}
+
+	@author Marky
+	@version 0.2.0
+*/
 #include Task_Template
+
 
 private func CreateTask()
 {
@@ -8,6 +22,18 @@ private func CreateTask()
 }
 
 
+/**
+ <ol>
+ <li>Finds an item, as defined by {@link Task_GetItem#SetItem}, with {@code Agent_FindItem(agent, GetItem())}.</li>
+ <li>Succeeds, if {@code Agent_HasItem(agent, item)}.</li>
+ <li>Otherwise,
+     <ul>
+     <li>if {@code Agent_IsNear(agent, item)} then {@code Agent_TakeItem(agent, item)}</li>
+     <li>else {@code Agent_MoveTo(agent, item)} where item is the item or its container</li>
+     </ul>
+ </li>
+ </ol>
+*/
 public func Execute(proplist controller, object agent)
 {
 	if (GetItem())
@@ -62,6 +88,16 @@ public func Execute(proplist controller, object agent)
 }
 
 
+/**
+ Defines what kind of item to get.
+
+ @par item The agent should get this item. This depends on the input type:
+<table>
+<tr><td>C4V_Def</td><td>Defines the type of the item.</td></tr>
+<tr><td>C4V_C4Object</td><td>Defines a specific item.</td></tr>
+<tr><td>C4V_Proplist, C4V_Array</td><td>Defines a one, or several search criteria that each have to be defined with {@link Global#Find_Later}.</td></tr>
+</table>
+*/
 public func SetItem(item)
 {
 	if (GetType(item) == C4V_Def || GetType(item) == C4V_C4Object || GetType(item) == C4V_PropList)
@@ -94,6 +130,12 @@ public func SetItem(item)
 }
 
 
+/**
+ Find out what kind of item should be fetched.
+ 
+ @return The item type.
+ @version 0.2.0
+ */
 public func GetItem()
 {
 	return this.TaskItem;
