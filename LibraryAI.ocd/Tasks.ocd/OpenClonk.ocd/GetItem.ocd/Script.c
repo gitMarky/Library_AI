@@ -45,22 +45,27 @@ private func CreateTask()
 */
 public func Execute(proplist controller, object agent)
 {
-	if (GetItem())
+	if (this.TaskConfigured)
 	{
 		var logic = controller->GetAgent();
+		var find_criteria = GetItem();
+		if (!find_criteria) // Item has vanished?
+		{
+			return TASK_EXECUTION_FAILURE;
+		}
 
 		var item;
-		if (GetType(GetItem()) == C4V_C4Object)
+		if (GetType(find_criteria) == C4V_C4Object)
 		{
-			item = GetItem();
+			item = find_criteria;
 		}
-		else if (GetType(GetItem()) == C4V_Def)
+		else if (GetType(find_criteria) == C4V_Def)
 		{
-			item = logic->Agent_FindItem(agent, Find_ID(GetItem()));
+			item = logic->Agent_FindItem(agent, Find_ID(find_criteria));
 		}
 		else
 		{
-			item = logic->Agent_FindItem(agent, Find_Now(GetItem()));
+			item = logic->Agent_FindItem(agent, Find_Now(find_criteria));
 		}
 		
 		if (item)
@@ -115,6 +120,7 @@ public func SetItem(item)
 	if (GetType(item) == C4V_Def || GetType(item) == C4V_C4Object || GetType(item) == C4V_PropList)
 	{
 		this.TaskItem = item;
+		this.TaskConfigured = true;
 		return this;
 	}
 	else if (GetType(item) == C4V_Array)
@@ -133,6 +139,7 @@ public func SetItem(item)
 		}
 
 		this.TaskItem = item;
+		this.TaskConfigured = true;
 		return this;
 	}
 	else

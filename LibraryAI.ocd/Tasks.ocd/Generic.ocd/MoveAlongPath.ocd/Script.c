@@ -10,9 +10,13 @@ private func CreateTask()
 
 public func Execute(proplist controller, object agent)
 {
-	if (!this.PathStart || !this.PathDestination)
+	if (!this.PathStartConfigured || !this.PathStartConfigured)
 	{
 		FatalError("Task definition error: There is not start and no destination");
+	}
+	if (!this.PathStart || !this.PathDestination) // Target or destination vanished?
+	{
+			return TASK_EXECUTION_FAILURE;
 	}
 	else
 	{
@@ -77,6 +81,7 @@ public func OnTaskFailure(proplist controller, object agent)
 public func SetStart(object start)
 {
 	this.PathStart = start;
+	this.PathStartConfigured = true;
 	ResetPath();
 	if (this.PathDestination)
 	{
@@ -89,6 +94,7 @@ public func SetStart(object start)
 public func SetDestination(object destination)
 {
 	this.PathDestination = destination;
+	this.PathDestinationConfigured = true;
 	ResetPath();
 	if (this.PathStart)
 	{

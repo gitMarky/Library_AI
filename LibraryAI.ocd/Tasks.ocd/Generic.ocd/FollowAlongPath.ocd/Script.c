@@ -10,22 +10,28 @@ private func CreateTask()
 
 public func Execute(proplist controller, object agent)
 {
-	if (GetTarget())
+	if (this.TaskConfigured)
 	{
 		var logic = controller->GetAgent();
+		
+		var find_criteria = GetTarget();
+		if (!find_criteria) // Target can vanish after configuration
+		{
+			return TASK_EXECUTION_FAILURE;
+		}
 
 		var target;
-		if (GetType(GetTarget()) == C4V_C4Object)
+		if (GetType(find_criteria) == C4V_C4Object)
 		{
-			target = GetTarget();
+			target = find_criteria;
 		}
-		else if (GetType(GetTarget()) == C4V_Def)
+		else if (GetType(find_criteria) == C4V_Def)
 		{
-			target = logic->Agent_FindItem(agent, Find_ID(GetTarget()));
+			target = logic->Agent_FindItem(agent, Find_ID(find_criteria));
 		}
 		else
 		{
-			target = logic->Agent_FindItem(agent, Find_Now(GetTarget()));
+			target = logic->Agent_FindItem(agent, Find_Now(find_criteria));
 		}
 		
 		if (target)
@@ -81,6 +87,7 @@ public func SetTarget(target)
 	if (GetType(target) == C4V_Def || GetType(target) == C4V_C4Object || GetType(target) == C4V_PropList)
 	{
 		this.TaskTarget = target;
+		this.TaskConfigured = true;
 		return this;
 	}
 	else if (GetType(target) == C4V_Array)
@@ -99,6 +106,7 @@ public func SetTarget(target)
 		}
 
 		this.TaskTarget = target;
+		this.TaskConfigured = true;
 		return this;
 	}
 	else
