@@ -30,6 +30,7 @@ private func CreateTask()
 
 
 /**
+ Task execution logic.
  <ol>
  <li>Finds an item, as defined by {@link Task_GetItem#SetItem}.</li>
  <li>Succeeds if the agent has such an item</li>
@@ -40,6 +41,7 @@ private func CreateTask()
      </ul>
  </li>
  </ol>
+ @version 0.2.0
 */
 public func Execute(proplist controller, object agent)
 {
@@ -104,6 +106,9 @@ public func Execute(proplist controller, object agent)
 <tr><td>C4V_C4Object</td><td>Defines a specific item.</td></tr>
 <tr><td>C4V_Proplist, C4V_Array</td><td>Defines a one, or several search criteria that each have to be defined with {@link Global#Find_Later}.</td></tr>
 </table>
+
+ @return The task itself, so that further function calls are possible.
+ @version 0.2.0
 */
 public func SetItem(item)
 {
