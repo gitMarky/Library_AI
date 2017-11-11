@@ -26,22 +26,21 @@ public func Execute(proplist controller, object agent)
 	if (this.PathInfo)
 	{
 		// Determine where to move to
-		var move_to = this.PathInfo[this.PathProgress];
-		if (!move_to)
+		//var move_to = this.PathInfo[this.PathProgress];
+		if (!this.PathMoveTo)
 		{
 			return TASK_EXECUTION_FAILURE;
 		}
 
 		// Takes too long?
-		this.PathTimeout = this.PathTimeout ?? (FrameCounter() + Max(100, ObjectDistance(agent, move_to) * 2)); // Timeout of at least 100 frames, or 200 frames per 100 pixels distance
-		if (FrameCounter() > this.PathTimeout)
+		if (this.PathTimeout && (FrameCounter() > this.PathTimeout))
 		{
 			return TASK_EXECUTION_FAILURE;
 		}
 
 		// Arrived?
 		var logic = controller->GetAgent();
-		if (logic->Agent_IsNear(agent, move_to))
+		if (logic->Agent_IsNear(agent, this.PathMoveTo))
 		{
 			// The next step!
 			this.PathProgress += 1;
@@ -54,12 +53,15 @@ public func Execute(proplist controller, object agent)
 			}
 			else
 			{
+				this.PathMoveFrom = this.PathMoveTo;
+				this.PathMoveTo = this.PathInfo[this.PathProgress];
+				this.PathTimeout = this.PathTimeout ?? (FrameCounter() + Max(100, ObjectDistance(agent, this.PathMoveTo) * 2)); // Timeout of at least 100 frames, or 200 frames per 100 pixels distance
 				return TASK_EXECUTION_IN_PROGRESS;
 			}
 		}
 		else // Move there!
 		{
-			logic->Agent_MoveTo(agent, move_to);
+			MoveAlongPath(logic, agent, this.PathMoveFrom, this.PathMoveTo);
 			return TASK_EXECUTION_IN_PROGRESS;
 		}
 	}
@@ -81,6 +83,8 @@ public func OnTaskFailure(proplist controller, object agent)
 public func SetStart(object start)
 {
 	this.PathStart = start;
+	this.PathMoveFrom = start;
+	this.PathMoveTo = start;
 	this.PathStartConfigured = true;
 	ResetPath();
 	if (this.PathDestination)
@@ -115,4 +119,10 @@ private func ResetPath()
 private func FindPath()
 {
 	this.PathInfo = this.PathInfo ?? Map_Waypoint->FindPath(this.PathStart, this.PathDestination);
+}
+
+
+private func MoveAlongPath(proplist logic, object agent, object move_from, object move_to)
+{
+	logic->Agent_MoveTo(agent, move_to);
 }
