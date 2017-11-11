@@ -26,7 +26,6 @@ public func Execute(proplist controller, object agent)
 	if (this.PathInfo)
 	{
 		// Determine where to move to
-		//var move_to = this.PathInfo[this.PathProgress];
 		if (!this.PathMoveTo)
 		{
 			return TASK_EXECUTION_FAILURE;
@@ -124,5 +123,13 @@ private func FindPath()
 
 private func MoveAlongPath(proplist logic, object agent, object move_from, object move_to)
 {
-	logic->Agent_MoveTo(agent, move_to);
+	var path = move_from->~GetPath(move_to);
+	if (path && path.OnMoveTo)
+	{
+		path->OnMoveTo(logic, agent, move_to);
+	}
+	else
+	{
+		logic->Agent_MoveTo(agent, move_to);
+	}
 }

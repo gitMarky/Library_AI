@@ -113,6 +113,7 @@ public func AddPath(object target, bool reconnect)
 		FatalError(Format("This waypoint already has a path to %v", target));
 	}
 
+	RemovePath(target);
 	paths[GetKey(target)] = new Map_Waypoint_Path
 	{
 		target = target,
@@ -124,6 +125,8 @@ public func AddPath(object target, bool reconnect)
 	{
 		target->AddPath(this, false);
 	}
+	
+	return GetPath(target);
 }
 
 
@@ -189,6 +192,39 @@ private func GetDistanceToWaypoint(object node)
 }
 
 
+/* -- Waypoint movement functions -- */
+
+public func MoveTo_Jump(proplist logic, object agent, object move_to)
+{
+	// Face the target
+	if (logic.Agent_LookAt)
+	{
+		logic->~Agent_LookAt(agent, move_to);
+	}
+	else
+	{
+		var dir;
+		if (move_to->GetX() < agent->GetX())
+		{
+			dir = 0;	
+		}
+		else
+		{
+			dir = 1;
+		}
+		agent->SetDir(dir);
+	}
+	// Clear agent command TODO
+	agent->SetCommand("None");
+	
+	// Jump
+	logic->Agent_Jump(agent);
+	
+	// Then move somewhere
+	logic->Agent_MoveTo(agent, move_to);
+}
+
+
 /* -- Internals -- */
 
 private func GetKey(object node)
@@ -219,6 +255,17 @@ static const Map_Waypoint_Path = new Global
 	GetCost = func ()
 	{
 		return this.cost;
+	},
+	
+	SetMoveTo = func (func call)
+	{
+		this.OnMoveTo = call;
+		return this;
+	},
+	
+	OnMoveTo = func (proplist logic, object agent, object move_to)
+	{
+		logic->Agent_MoveTo(agent, move_to);
 	},
 };
 
