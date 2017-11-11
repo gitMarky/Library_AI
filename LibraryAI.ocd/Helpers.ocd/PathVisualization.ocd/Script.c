@@ -69,10 +69,10 @@ func Set(object start, object end, int flags, int jetpack, int iPath, int iDir)
 
 func MyColor(int flags, int jetpack, object start)
 {
-	SetAction("Vis", start);
+	SetAction("Move", start);
 	if (jetpack)
 	{
-		SetAction("Vis3", start);
+		SetAction("Script", start);
 		return RGB(255, 0, 0);
 	}
 	else
@@ -87,10 +87,10 @@ func MyColor(int flags, int jetpack, object start)
 		}
 		if (flags == Path_Backflip)
 		{
-			SetAction("Vis3", start);
+			SetAction("Script", start);
 			return RGB(255, 255, 0);
 		}
-		SetAction("Vis2", start);
+		SetAction("Transport", start);
 		if (flags == Path_Lift)
 		{
 			return RGB(255, 0, 255);
@@ -110,9 +110,9 @@ local Plane = 10000;
 // actions
 
 local ActMap = {
-Vis = {
+Move = {
 	Prototype = Action,
-	Name = "Vis",
+	Name = "Move",
 	Procedure = DFA_ATTACH,
 	Length = 1,
 	X = 0,
@@ -124,9 +124,9 @@ Vis = {
 	NextAction = "Hold",
 },
 
-Vis2 = {
+Transport = {
 	Prototype = Action,
-	Name = "Vis2",
+	Name = "Transport",
 	Procedure = DFA_ATTACH,
 	Length = 1,
 	X = 32,
@@ -138,9 +138,9 @@ Vis2 = {
 	NextAction = "Hold",
 },
 
-Vis3 = {
+Script = {
 	Prototype = Action,
-	Name = "Vis3",
+	Name = "Script",
 	Procedure = DFA_ATTACH,
 	Length = 1,
 	X = 64,
