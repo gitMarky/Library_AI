@@ -54,14 +54,13 @@ public func Execute(proplist controller, object agent)
 			{
 				this.PathMoveFrom = this.PathMoveTo;
 				this.PathMoveTo = this.PathInfo[this.PathProgress];
-				this.PathTimeout = this.PathTimeout ?? (FrameCounter() + Max(100, ObjectDistance(agent, this.PathMoveTo) * 2)); // Timeout of at least 100 frames, or 200 frames per 100 pixels distance
+				this.PathTimeout = FrameCounter() + Max(100, ObjectDistance(agent, this.PathMoveTo) * 2); // Timeout of at least 100 frames, or 200 frames per 100 pixels distance
 				return TASK_EXECUTION_IN_PROGRESS;
 			}
 		}
 		else // Move there!
 		{
-			MoveAlongPath(logic, agent, this.PathMoveFrom, this.PathMoveTo);
-			return TASK_EXECUTION_IN_PROGRESS;
+			return MoveAlongPath(logic, agent, this.PathMoveFrom, this.PathMoveTo);
 		}
 	}
 	else
@@ -132,4 +131,5 @@ private func MoveAlongPath(proplist logic, object agent, object move_from, objec
 	{
 		logic->Agent_MoveTo(agent, move_to);
 	}
+	return TASK_EXECUTION_IN_PROGRESS;
 }
