@@ -199,34 +199,40 @@ private func GetDistanceToWaypoint(object node)
 
 /* -- Waypoint movement functions -- */
 
-public func OnMoveTo_Jump(proplist logic, object agent, object move_to)
+public func OnMoveTo_Jump(proplist logic, object agent, object move_from, object move_to)
 {
-	// Face the target
-	if (logic.Agent_LookAt)
+	if (logic->Agent_IsNear(agent, move_from))
 	{
-		logic->~Agent_LookAt(agent, move_to);
-	}
-	else
-	{
-		var dir;
-		if (move_to->GetX() < agent->GetX())
+		// Face the target
+		if (logic.Agent_LookAt)
 		{
-			dir = 0;	
+			logic->~Agent_LookAt(agent, move_to);
 		}
 		else
 		{
-			dir = 1;
+			var dir;
+			if (move_to->GetX() < agent->GetX())
+			{
+				dir = 0;	
+			}
+			else
+			{
+				dir = 1;
+			}
+			agent->SetDir(dir);
 		}
-		agent->SetDir(dir);
+	
+		// Then jump
+		logic->Agent_Jump(agent);
+
+		// Clear agent command TODO
+		agent->SetCommand("None");
 	}
-	// Clear agent command TODO
-	agent->SetCommand("None");
-	
-	// Jump
-	logic->Agent_Jump(agent);
-	
-	// Then move somewhere
-	logic->Agent_MoveTo(agent, move_to);
+	else
+	{
+		// Move there
+		logic->Agent_MoveTo(agent, move_to);
+	}
 }
 
 
@@ -268,7 +274,7 @@ static const Map_Waypoint_Path = new Global
 		return this;
 	},
 	
-	OnMoveTo = func (proplist logic, object agent, object move_to)
+	OnMoveTo = func (proplist logic, object agent, object move_from, object move_to)
 	{
 		logic->Agent_MoveTo(agent, move_to);
 	},

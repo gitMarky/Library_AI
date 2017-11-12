@@ -126,7 +126,7 @@ private func MoveAlongPath(proplist logic, object agent, object move_from, objec
 	var path = move_from->~GetPath(move_to);
 	if (path && path.OnMoveTo)
 	{
-		path->OnMoveTo(logic, agent, move_to);
+		path->OnMoveTo(logic, agent, move_from, move_to);
 	}
 	else
 	{
