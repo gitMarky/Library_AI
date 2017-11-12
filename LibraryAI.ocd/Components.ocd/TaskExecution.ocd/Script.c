@@ -12,7 +12,7 @@
 
 /**
  This is the AI execution logic. Does nothing if the callback
- {@code QueryCallExecute} returns {@code true}.
+ {@code QueryRejectCallExecute} returns {@code true}.
 
  Execution order is as follows:
  <ol>
@@ -31,7 +31,7 @@
 */
 public func Execute(effect controller, int time)
 {
-	if (this->~QueryCallExecute(controller, controller.Target, time))
+	if (this->~QueryRejectCallExecute(controller, controller.Target, time))
 	{
 		return FX_OK;
 	}
