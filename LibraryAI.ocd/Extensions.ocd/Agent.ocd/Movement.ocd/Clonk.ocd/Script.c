@@ -18,7 +18,14 @@ public func Agent_MoveTo(object agent, object target)
 	AssertNotNil(agent);
 	AssertNotNil(target);
 
-	if (!agent->GetAI()->GetAgent()->Agent_IsReadyForCommand(agent)) return;
+	var com_name = agent->GetCommand(0);
+	var com_target = agent->GetCommand(1);
+
+	
+
+	if (!agent->GetAI()->GetAgent()->Agent_IsReadyForCommand(agent)
+	 && !(com_name == "MoveTo" && com_target == target)) return;
+	
 	
 	if (target->GetSpeed() <= 2)
 	{
