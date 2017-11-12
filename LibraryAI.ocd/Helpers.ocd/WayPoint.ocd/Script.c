@@ -117,9 +117,14 @@ public func AddPath(object target, bool reconnect)
 	paths[GetKey(target)] = new Map_Waypoint_Path
 	{
 		target = target,
+		EditorInfo = 
+		{
+			Color =  {R = 0, G = 255, B = 0},
+			Gfx = "Move",
+		},
 	};
 	
-	Map_PathVisualization->Create(this, target); //, flag, jetpdelay, path_id, dir);
+	Map_PathVisualization->Create(this, target); //, flag, jetpdelay, dir);
 
 	if (reconnect)
 	{
@@ -194,7 +199,7 @@ private func GetDistanceToWaypoint(object node)
 
 /* -- Waypoint movement functions -- */
 
-public func MoveTo_Jump(proplist logic, object agent, object move_to)
+public func OnMoveTo_Jump(proplist logic, object agent, object move_to)
 {
 	// Face the target
 	if (logic.Agent_LookAt)

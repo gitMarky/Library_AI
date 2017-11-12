@@ -1,7 +1,7 @@
 /*-- Path visualization --*/
 
 
-local so, eo, sx, sy, ex, ey, flag, jtpk, path, dir;
+local so, eo, sx, sy, ex, ey, flag, jtpk, dir;
 
 func Initialize()
 {
@@ -10,6 +10,15 @@ func Initialize()
 
 func UpdatePath()
 {
+	if (so && eo)
+	{
+		var path = so->GetPath(eo);
+		
+		if (path)
+		{
+			SetClrModulation(MyColor(path, nil, so));
+		}
+	}
 	/*if (so && so->GetPath(path)->GetTarget())
 	{
 		// change?
@@ -25,14 +34,14 @@ func UpdatePath()
 	}*/
 }
 
-func Create(object start, object end, int flags, int jetpack, int iPath, int iDir)
+func Create(object start, object end, int flags, int jetpack, int iDir)
 {
 	var line = CreateObject(Map_PathVisualization);
-	line->Set(start, end, flags, jetpack, iPath, iDir);
+	line->Set(start, end, flags, jetpack, iDir);
 	return line;
 }
 
-func Set(object start, object end, int flags, int jetpack, int iPath, int iDir)
+func Set(object start, object end, int flags, int jetpack, int iDir)
 {
 	so = start;
 	sx = start->GetX();
@@ -42,11 +51,13 @@ func Set(object start, object end, int flags, int jetpack, int iPath, int iDir)
 	ey = end->GetY();
 	flag = flags;
 	jtpk = jetpack;
-	path = iPath;
 	dir = iDir ?? 1;
 	
+	
+	var path = start->GetPath(end);
+	
 	SetObjectBlitMode(GFX_BLIT_Additive);
-	SetClrModulation(MyColor(flags, jetpack, start));
+	SetAction("Move", start);
 
 	var cl = 1000 * Distance(sx, sy, ex, ey) / 256;
 	var w = 650;
@@ -67,7 +78,8 @@ func Set(object start, object end, int flags, int jetpack, int iPath, int iDir)
 	SetObjDrawTransform(-width * dir, xskew, xadjust, -yskew * dir, height, yadjust);
 }
 
-func MyColor(int flags, int jetpack, object start)
+
+func MyColor(proplist path, int jetpack, object start)
 {
 	SetAction("Move", start);
 	if (jetpack)
@@ -77,6 +89,12 @@ func MyColor(int flags, int jetpack, object start)
 	}
 	else
 	{
+		if (path.OnMoveTo == Map_Waypoint.OnMoveTo_Jump)
+		{
+			return RGB(255, 255, 0);
+		}
+
+	
 		//if (flags == Path_MoveTo)
 		//{
 			return RGB(0, 255, 0);
