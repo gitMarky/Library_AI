@@ -268,6 +268,12 @@ static const Map_Waypoint_Path = new Global
 		return this.cost;
 	},
 	
+	SetCost = func (int cost)
+	{
+		this.cost = cost;
+		return this;
+	},
+	
 	SetMoveTo = func (func call)
 	{
 		this.OnMoveTo = call;
