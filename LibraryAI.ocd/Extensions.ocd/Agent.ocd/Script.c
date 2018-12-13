@@ -1,6 +1,6 @@
 /**
 	Basic functionality for agents
- 
+
 	Tasks define what to do, such as: Get an item, attack an enemy.
 
 	Agents on the other hand, define if the object can do that
@@ -19,7 +19,7 @@
 	@author Marky
 	@version 0.2.0
  */
- 
+
 /* -- Callbacks -- */
 
 /**
@@ -28,7 +28,7 @@
 public func Agent_Initialize(object agent)
 {
 	AssertDefinitionContext();
-	
+
 	if (!agent.agent_property_list)
 	{
 		// Initialize empty proplist

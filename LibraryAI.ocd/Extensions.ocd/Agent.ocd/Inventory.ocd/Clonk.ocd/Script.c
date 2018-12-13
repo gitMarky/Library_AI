@@ -1,6 +1,6 @@
 /**
 	Agent inventory logic for a Clonk 
- 
+
 	@author Marky
 	@version 0.2.0
  */
@@ -11,10 +11,10 @@
 
  @par agent The object that is acting - the Clonk.
  @par item The desired item.
- 
+
  @return {@code true} if the item is contained in the agent,
          or the value of the {@link Global#_inherited} function.
- 
+
  @version 0.2.0
  */
 public func Agent_HasItem(object agent, object item)
@@ -34,7 +34,7 @@ public func Agent_HasItem(object agent, object item)
  @par item The desired item.
 
  @note Calls {@link Global#Collect} in the item. 
- 
+
  @version 0.2.0
  */
 public func Agent_TakeItem(object agent, object item)
@@ -55,7 +55,7 @@ public func Agent_TakeItem(object agent, object item)
 
  @return bool {@code true} if the distance between
               item and agent is less than 10 pixels. 
- 
+
  @version 0.2.0
  */
 public func Agent_CanTakeItem(object agent, object item)
@@ -73,7 +73,7 @@ public func Agent_CanTakeItem(object agent, object item)
  @return object An object of the desired type.
          This is {@link Global#FindContents} of that type,
          or the {@link Global#_inherited} function. 
- 
+
  @version 0.2.0
  */
 public func Agent_FindItemType(object agent, def type)
@@ -94,7 +94,7 @@ public func Agent_FindItemType(object agent, def type)
                 {@link Global#Find_Container} where the
                 agent is the container,
                 or the {@link Global#_inherited} function.
- 
+
  @version 0.2.0
  */
 public func Agent_FindItem(object agent, array find_criteria)
@@ -111,7 +111,7 @@ public func Agent_FindItem(object agent, array find_criteria)
  @par item The desired item.
 
  @note Calls {@link Library_ClonkInventoryControl#SetHandItemPos} in the item. 
- 
+
  @version 0.2.0
  */
 public func Agent_SelectItem(object agent, object item)

@@ -1,6 +1,6 @@
 /**
 	AI Component: Task execution
-	
+
 	Use this component in your AI if you want it to be able to solve/execute tasks.
 
 	@author Marky
@@ -42,14 +42,14 @@ public func Execute(effect controller, int time)
 	{
 		task->~Execute(controller, controller.Target);
 	}
-	
+
 	// handle the active prioritized task - probably easier by passing the effect to the function
-	
+
 	var current_task = controller->GetCurrentTask() ?? controller->FindCurrentTask();
 	if (current_task)
 	{
 		var status = current_task->~Execute(controller, controller.Target);
-		
+
 		if (status == TASK_EXECUTION_SUCCESS)
 		{
 			current_task->~OnTaskSuccess(controller, controller.Target);
@@ -80,7 +80,7 @@ public func Execute(effect controller, int time)
 public func OnDefineAI(proplist controller)
 {
 	_inherited(controller);
-	
+
 	// add functions to the AI
 	controller->GetControlEffect()->AddFunctions(
 	[
@@ -256,7 +256,7 @@ public func GetCurrentTask()
 
 /**
  Gets a task with a specific ID. Each task ID is unique.
- 
+
  @par nr The task ID.
  @return proplist The task, or {@code nil} if this controller
          has no such task.
@@ -309,7 +309,7 @@ public func SetAgent(def agent)
 private func SetCurrentTask(proplist task)
 {
 	AssertNotNil(task);
-	
+
 	// TODO: At the moment this simply overrides the current task
 	// Should probably have some kind of handshake-mechanism, so
 	// that the old task can perform a cleanup
@@ -337,7 +337,7 @@ private func FindCurrentTask()
 	else
 	{
 		RemoveHoles(GetPriorityTasks());
-		
+
 		// find
 		var current_task;
 		for (var i = 0; i < GetLength(GetPriorityTasks()); ++i)
@@ -345,14 +345,14 @@ private func FindCurrentTask()
 			// update task index
 			var task = GetPriorityTasks()[i];
 			task.PriorityIndex = i;
-		
+
 			// potential candidate
 			if (!current_task || current_task->GetPriority() < task->GetPriority())
 			{
 				current_task = task;
 			}
 		}
-		
+
 		// update actual current task
 		if (GetCurrentTask() != current_task)
 		{

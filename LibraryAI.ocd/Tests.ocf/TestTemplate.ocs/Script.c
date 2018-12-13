@@ -6,7 +6,7 @@ protected func InitializePlayer(int player)
 	SetFoW(false, player);
 	GetCrew(player)->SetPosition(120, 190);
 	GetCrew(player)->MakeInvincible();
-	
+
 	// Add test control effect.
 	LaunchTest(1);
 	return true;

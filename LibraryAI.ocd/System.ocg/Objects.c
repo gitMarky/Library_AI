@@ -8,7 +8,7 @@
 global func GetNearestObject(array objects)
 {
 	AssertObjectContext();
-	
+
 	var nearest;
 	for (var object in objects)
 	{
@@ -17,6 +17,6 @@ global func GetNearestObject(array objects)
 			nearest = object;
 		}
 	}
-	
+
 	return nearest;
 }

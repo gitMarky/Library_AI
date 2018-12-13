@@ -6,7 +6,7 @@ protected func InitializePlayer(int player)
 	SetFoW(false, player);
 	GetCrew(player)->SetPosition(120, 190);
 	GetCrew(player)->MakeInvincible();
-	
+
 	// Add test control effect.
 	LaunchTest(2);
 	return true;
@@ -37,7 +37,7 @@ global func OnTestFinished()
 	if (CurrentTest().Item) CurrentTest().Item->RemoveObject();
 	CurrentTest().AddedAI = false;
 	CurrentTest().TaskSuccess = false;
-	
+
 	if (CurrentTest().AdditionalObjects)
 	{
 		for (var obj in CurrentTest().AdditionalObjects)
@@ -76,7 +76,7 @@ global func Test1_Execute()
 	else
 	{
 		SetupAgent();
-		
+
 		Task_GetItem->AddTo(CurrentTest().Bot, 1)->SetItem(Rock);
 		return Wait();
 	}
@@ -115,7 +115,7 @@ global func Test2_Execute()
 	else
 	{
 		SetupAgent();
-		
+
 		Task_GetItem->AddTo(CurrentTest().Bot, 1)->SetItem(Rock);
 		return Wait();
 	}
@@ -201,7 +201,7 @@ global func Test4_Execute()
 		{
 			var metal = doTest("Metal should be collected by the first bot. It is contained in %v, expected %v.", FindObject(Find_ID(Metal))->Contained(), CurrentTest().Bot);
 			var wood = doTest("Wood should be collected by the second bot. It is contained in %v, expected %v.", FindObject(Find_ID(Wood))->Contained(), CurrentTest().Bot2);
-		
+
 			if (wood && metal)
 			{
 				return PassTest("The agents collected the specified items");

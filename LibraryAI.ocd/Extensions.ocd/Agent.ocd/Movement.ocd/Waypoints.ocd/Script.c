@@ -1,6 +1,6 @@
 /**
 	Move along waypoints
-	
+
 	Might be changed to a task, though, because that is essentially what it is (macro command in Hazard).
  */
 
@@ -12,9 +12,9 @@ public func Agent_MoveTo(object agent, object destination)
 	AssertNotNil(destination);
 
 	if (!agent->GetAI()->GetAgent()->Agent_IsReadyForCommand(agent)) return;
-	
+
 	var path = Map_Waypoint->FindPath(agent, destination);
-	
+
 	if (path)
 	{
 		var fx = GetEffect(FxMoveAlongPath.Name, agent) ?? agent->CreateEffect(FxMoveAlongPath, 1, 1);
@@ -58,11 +58,11 @@ local FxMoveAlongPath = new Effect
 		// Something changed? Update the path, but only every 35 frames (displaced by 18, so that it does not recalculate instantly)
 		var interval_ok = (time % 35) == 18;
 		var destination_changed = this.x != this.destination->GetX() || this.y != this.destination->GetY();
-		
+
 		var dist_path = Distance(this.start_x, this.start_y, waypoint->GetX(), waypoint->GetY());
 		var dist_agent = Distance(this.start_x, this.start_y, agent->GetX(), agent->GetY());
 		var dist_wp = ObjectDistance(agent, waypoint);
-		
+
 		var off_path = dist_wp >= (6 * dist_path / 5); // logic->Agent_IsBetween(agent->GetX(), agent->GetY(), this.start_x, this.start_y, waypoint->GetX(), waypoint->GetY());
 		if (interval_ok && (destination_changed || off_path))
 		{

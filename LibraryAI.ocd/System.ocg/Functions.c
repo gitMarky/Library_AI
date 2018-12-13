@@ -29,7 +29,7 @@ global func AddFunction(func call, bool override)
 	{
 		FatalError(Format("Cannot override function %s", name));
 	}
-	
+
 	this[name] = call;
 }
 

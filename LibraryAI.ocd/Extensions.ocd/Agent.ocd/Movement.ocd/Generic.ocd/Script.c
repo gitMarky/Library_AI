@@ -1,5 +1,5 @@
 /**
- 
+
  */
 
 
@@ -13,9 +13,9 @@ public func Agent_IsBetween(int current_x, int current_y, int start_x, int start
 	{
 		var angle_to_start = Angle(current_x, current_y, start_x, start_y);
 		var angle_to_end = Angle(current_x, current_y, end_x, end_y);
-		
+
 		var angle = Abs(Normalize(angle_to_start - angle_to_end, 0));
-		
+
 		return angle > 90;
 	}
 }

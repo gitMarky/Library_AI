@@ -33,7 +33,7 @@ public func GetTimerInterval(){	return 3;}
 public func OnDefineAI(proplist def)
 {
 	_inherited(def);
-	
+
 	// Can be added to Clonk
 	AddEditorProp_AISelection(Clonk, AI_OpenClonk);
 }

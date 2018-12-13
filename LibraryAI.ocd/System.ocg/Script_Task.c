@@ -1,6 +1,6 @@
 /**
 	Definition for tasks.
-	
+
 	@author Marky
 	@version 0.1.0
 */
@@ -21,11 +21,11 @@ static const Task = new Effect
 	{
 		this.task_data.priority = priority;
 	},
-	
-	
+
+
 	/**
 	 Gets the priority of the task.
-	 
+
 	 @return int The priority, and if the task has
 	         a parent task, the parent priority
 	         is added to the value.
@@ -40,12 +40,12 @@ static const Task = new Effect
 		}
 		return this.task_data.priority + from_parent;
 	},
-	
+
 	SetDescription = func (int description)
 	{
 		this.task_data.description = description;
 	},
-	
+
 	GetDescription = func ()
 	{
 		return this.task_data.description;
@@ -68,7 +68,7 @@ static const Task = new Effect
 	{
 		return this.task_parent; // relies on proplists being passed as a reference, cannot be saved in task_data or else all tasks have the same parent
 	},
-	
+
 	/**
 	 Sets the task ID. This can be done only once.
 	 @par ID The task ID.
@@ -85,8 +85,8 @@ static const Task = new Effect
 			this.task_id = ID;
 		}
 	},
-	
-	
+
+
 	/**
 	 Gets a unique numeric identifier for the task, if it was assigned.
 	 @version 0.2.0
@@ -95,18 +95,18 @@ static const Task = new Effect
 	{
 		return this.task_id;
 	},
-	
+
 	IsTransferrable = func ()
 	{
 		return this.task_data.transferrable;
 	},
-	
+
 	/* -- Callbacks -- */
-	
+
 	Construction = func()
 	{
 		this.Interval = 0; // never calls a timer
-		
+
 		if (this.Priority) // delegate the priority to the internal stuff, too
 		{
 			this->SetPriority(this.Priority);
@@ -114,7 +114,7 @@ static const Task = new Effect
 
 		return FX_OK;
 	},
-	
+
 	/* -- Internals -- */
 
 	task_data = {
@@ -123,19 +123,19 @@ static const Task = new Effect
 		transferrable = false,
 		description = "unknown",
 	},
-	
+
 	GetTaskType = func ()
 	{
 		return this.task_data.type;
 	},
-	
+
 	SetTaskType = func (id type)
 	{
 		this.task_data.type = type;
 	},
 
 	/* -- Execution -- */
-	
+
 	Execute = func (proplist controller, object agent)
 	{
 	},

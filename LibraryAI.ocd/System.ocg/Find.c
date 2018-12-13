@@ -11,7 +11,7 @@
 
  This is useful if you want to define certain criteria for finding objects, but you
  need them in a different function call.
- 
+
  @par call This Find_* function that will be called.
            Should be a function pointer to one of the Global.Find_* functions.
            Up to 9 additional parameters for the function call are possible.
@@ -27,9 +27,9 @@ global func Find_Later(func call)
 		{
 			FatalError("Find_Later and Find_Now may not be called later");
 		}
-	
+
 		var find_criteria = { FunctionCall = call, FunctionParameters = []};
-		
+
 		var parameter;
 		for (var i = 1; parameter = Par(i); ++i)
 		{
@@ -46,7 +46,7 @@ global func Find_Later(func call)
 
 /**
  Evaluates a {@link Global#Find_Later} function.
- 
+
  @par find_criteria Can either be criteria defined by Find_Later or
                     an array of criteria defined by Find_Later.
                     In case of an array, the criteria will be

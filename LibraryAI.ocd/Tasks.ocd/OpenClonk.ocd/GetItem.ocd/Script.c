@@ -7,14 +7,14 @@
 		{@code Task_GetItem->AddTo(clonk, priority)->SetTarget(Metal)}
 		Makes {@code clonk} collect a {@code Metal} object.
 	}
-	
+
 	Requires the following functions to be implemented in the agent logic:
 	- {@code Agent_FindItem(agent, GetItem())}
 	- {@code Agent_HasItem(agent, item)}
     - {@code Agent_IsNear(agent, item)}
     - {@code Agent_TakeItem(agent, item)}
     - {@code Agent_MoveTo(agent, item)}
-    
+
 	@author Marky
 	@version 0.2.0
 */
@@ -67,7 +67,7 @@ public func Execute(proplist controller, object agent)
 		{
 			item = logic->Agent_FindItem(agent, Find_Now(find_criteria));
 		}
-		
+
 		if (item)
 		{
 			if (logic->Agent_HasItem(agent, item)) // got it
@@ -86,7 +86,7 @@ public func Execute(proplist controller, object agent)
 				{
 					logic->Agent_MoveTo(agent, move_to);
 				}
-				
+
 				return TASK_EXECUTION_IN_PROGRESS;
 			}
 		}
@@ -151,7 +151,7 @@ public func SetItem(item)
 
 /**
  Find out what kind of item should be fetched.
- 
+
  @return The item type.
  @version 0.2.0
  */

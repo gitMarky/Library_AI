@@ -1,7 +1,7 @@
 /**
 	AI
 	Tests for the AI system.
-	
+
 	@author Maikel
 */
 
@@ -30,17 +30,17 @@ protected func InitializePlayer(int plr)
 				SetHostility(plr1, plr2, true, true);			
 				SetHostility(plr2, plr2, true, true);
 			}
-			
+
 	// Initialize script players differently.	
 	if (GetPlayerType(plr) == C4PT_Script)
 		return InitializeScriptPlayer(plr);
-	
+
 	// Everything visible to the observer.
 	SetFoW(false, plr);
 	SetPlayerZoomByViewRange(plr, LandscapeWidth(), LandscapeHeight(), PLRZOOM_Direct | PLRZOOM_Set | PLRZOOM_LimitMax);
 	var container = CreateObject(RelaunchContainer, LandscapeWidth() / 2, LandscapeHeight() / 2);
 	GetCrew(plr)->Enter(container);
-	
+
 	// Add test control effect.
 	var fx = AddEffect("IntTestControl", nil, 100, 2);
 	fx.testnr = 1;
@@ -58,7 +58,7 @@ protected func InitializeScriptPlayer(int plr)
 		GetCrew(plr, index)->RemoveObject();
 		index++;
 	}
-	
+
 	// Store the script player number.
 	if (script_enemy1 == nil)
 		script_enemy1 = plr;

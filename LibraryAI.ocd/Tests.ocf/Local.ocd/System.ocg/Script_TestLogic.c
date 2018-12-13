@@ -88,19 +88,19 @@ global func FxIntTestControlTimer(object target, proplist test)
 		test.launched = true;
 		test.count_total++;
 	}
-	
+
 	// waiting
 	if (test.wait > 0)
 	{
 		test.wait -= 1;
 		return FX_OK;
 	}
-	
+
 	// Check whether the current test has been finished.
 	if (Call(Format("Test%d_Execute", test.testnr)))
 	{
 		test.launched = false;
-		
+
 		if (test.current_result)
 		{
 			Log(">> Test %d passed.", test.testnr);
@@ -110,7 +110,7 @@ global func FxIntTestControlTimer(object target, proplist test)
 			Log(">> Test %d failed.", test.testnr);
 			test.count_failed++;
 		}
-		
+
 		// Update global result
 		test.global_result &= test.current_result;
 		test.current_result = false;
@@ -128,10 +128,10 @@ global func FxIntTestControlTimer(object target, proplist test)
 global func doTest(description, returned, expected)
 {
 	var test = (returned == expected);
-	
+
 	var predicate = "[Fail]";
 	if (test) predicate = "[Pass]";
-	
+
 	Log(Format("%s %s", predicate, description), returned, expected);
 	return test;
 }
