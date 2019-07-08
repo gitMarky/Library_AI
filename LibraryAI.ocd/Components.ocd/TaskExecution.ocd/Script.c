@@ -359,7 +359,7 @@ private func FindCurrentTask()
 			SetCurrentTask(current_task);
 		}
 
-		return task;
+		return current_task;
 	}
 }
 
