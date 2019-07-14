@@ -18,7 +18,7 @@
  @return proplist A proplist that can be used in {@link Global#Find_Now}.
  @version 0.2.0
  */
-global func Find_Later(func call)
+global func Find_Later(func call, ...)
 {
 	var function_name = GetFunctionName(call);
 	if (RegexMatch(function_name, "Find_.+"))

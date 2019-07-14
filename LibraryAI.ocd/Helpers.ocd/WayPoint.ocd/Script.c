@@ -42,7 +42,7 @@ private func Construction()
  @return array the path to the goal waypoint, as an array,
                or {@code nil} if no path was found.
  */
-public func FindPath(start, goal)
+public func FindPath(start, goal, ...)
 {
 	AssertNotNil(start);
 	AssertNotNil(goal);
